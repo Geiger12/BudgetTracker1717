@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Budget Tracker: tap a bill paid, see what’s left</title>
+<meta name="description" content="Budget Tracker: tap a bill paid, filter what’s left, and see everything on one screen. Saved on your phone, no account.">
+<link rel="canonical" href="https://geiger12.github.io/BudgetTracker17/about/">
+<link rel="icon" href="img/icon-192.png" type="image/png">
+<meta name="theme-color" content="#2ebfd9">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Budget Tracker">
+<meta property="og:title" content="Budget Tracker: tap a bill paid, see what’s left">
+<meta property="og:description" content="Filter what’s left, see it all on one screen, and pick your own colors. Saved on your phone, no account.">
+<meta property="og:url" content="https://geiger12.github.io/BudgetTracker17/about/">
+<meta property="og:image" content="https://geiger12.github.io/BudgetTracker17/about/preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A phone showing the Budget Tracker overview with three gauges, beside the words: Tap a bill paid. See what’s left.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Budget Tracker: tap a bill paid, see what’s left">
+<meta name="twitter:description" content="Filter what’s left, see it all on one screen, and pick your own colors. Saved on your phone, no account.">
+<meta name="twitter:image" content="https://geiger12.github.io/BudgetTracker17/about/preview.png">
+<style>
+:root{--cyan:#2ebfd9;--deep:#0e7c91;--yellow:#fdcb2f;--ink:#1f2933;--muted:#4b5563;--mist:#f2f6f7;--white:#fff;--font:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:var(--font);font-size:18px;line-height:1.6;color:var(--ink);background:var(--white);-webkit-text-size-adjust:100%}
+img{max-width:100%;height:auto}
+a{color:var(--deep)}
+:focus-visible{outline:3px solid var(--ink);outline-offset:3px;border-radius:6px}
+.skip{position:absolute;left:-999px;top:8px;background:var(--ink);color:var(--white);padding:10px 16px;border-radius:10px;z-index:10}
+.skip:focus{left:8px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+h1,h2,h3{font-weight:800;letter-spacing:-0.025em;line-height:1.08;margin:0}
+h1{font-size:clamp(2.5rem,7.4vw,4.7rem)}
+h2{font-size:clamp(1.8rem,4.6vw,2.7rem)}
+h3{font-size:1.25rem;letter-spacing:-0.01em}
+p{margin:0}
+.lede{font-size:clamp(1.1rem,2.4vw,1.3rem);max-width:34em}
+.btn{display:inline-block;padding:14px 24px;border-radius:14px;border:3px solid var(--ink);font-weight:700;text-decoration:none;color:var(--ink);background:var(--yellow);box-shadow:5px 5px 0 var(--ink);transition:transform .12s,box-shadow .12s}
+.btn:hover{transform:translate(2px,2px);box-shadow:3px 3px 0 var(--ink)}
+.btn.dark{background:var(--ink);color:var(--white);box-shadow:5px 5px 0 var(--white)}
+.btn.dark:hover{box-shadow:3px 3px 0 var(--white)}
+.textlink{color:var(--ink);font-weight:600}
+.frame{background:var(--ink);padding:8px;border-radius:40px;box-shadow:12px 12px 0 var(--yellow);width:min(100%,270px)}
+.frame img{display:block;width:100%;border-radius:33px;background:var(--white)}
+.pane{background:var(--ink);padding:7px;border-radius:26px;box-shadow:12px 12px 0 var(--yellow);width:min(100%,340px)}
+.pane img{display:block;width:100%;border-radius:20px;background:var(--white)}
+
+header.top{background:var(--cyan)}
+header.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:14px;padding-bottom:14px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.05rem;color:var(--ink);text-decoration:none;white-space:nowrap}
+.brand img{width:36px;height:36px;border-radius:9px;border:3px solid var(--ink)}
+header.top .btn{padding:9px 14px;box-shadow:4px 4px 0 var(--ink);white-space:nowrap;font-size:.95rem}
+@media(min-width:480px){.brand{font-size:1.15rem;gap:12px}.brand img{width:40px;height:40px}header.top .btn{padding:10px 18px;font-size:1rem}}
+
+.hero{background:var(--cyan);overflow:hidden}
+.hero .wrap{display:grid;gap:36px;align-items:end;padding-top:36px}
+.hero-text{display:grid;gap:22px;padding-bottom:12px;align-self:center}
+.hero h1 span{display:block}
+.cta{display:flex;flex-wrap:wrap;gap:18px 26px;align-items:center}
+.hero-phone{justify-self:center;margin-bottom:-150px}
+@media(min-width:860px){.hero .wrap{grid-template-columns:1.1fr .9fr;padding-top:56px}.hero-phone{justify-self:end;margin-right:10px;margin-bottom:-220px}.frame{width:340px;padding:9px;border-radius:44px;box-shadow:14px 14px 0 var(--yellow)}.frame img{border-radius:36px}.pane{width:380px}}
+
+section{padding:72px 0}
+.tabs-band{background:var(--white);padding-top:96px}
+.tabs-band .intro{max-width:36em;display:grid;gap:12px;margin-bottom:32px}
+.tabsimg{max-width:760px;background:var(--ink);padding:6px;border-radius:24px;box-shadow:12px 12px 0 var(--yellow)}
+.tabsimg img{display:block;width:100%;border-radius:18px;background:var(--white)}
+.tabnames{display:grid;gap:20px 28px;margin:44px 0 0;padding:0;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.tabnames div{border-top:4px solid var(--cyan);padding-top:12px}
+.tabnames dt{font-weight:800;font-size:1.15rem}
+.tabnames dd{margin:4px 0 0;color:var(--muted)}
+
+.feature{background:var(--mist)}
+.feature.alt{background:var(--white)}
+.feature .wrap{display:grid;gap:36px;align-items:center}
+.feature .text{display:grid;gap:16px;max-width:30em}
+.feature .shot{justify-self:center}
+@media(min-width:860px){.feature .wrap{grid-template-columns:1fr 1fr;gap:72px}.feature.flip .shot{order:-1}.feature .shot{justify-self:center}}
+.facts{margin:6px 0 0;padding-left:1.1em;color:var(--muted)}
+.facts li{margin:4px 0}
+
+.looks{background:var(--mist)}
+.looks .intro{max-width:34em;display:grid;gap:14px;margin-bottom:48px}
+.trio{display:grid;gap:14px;grid-template-columns:repeat(3,minmax(0,1fr));justify-items:center}
+@media(min-width:700px){.trio{gap:36px}}
+.trio figure{margin:0;display:grid;gap:18px;justify-items:center;width:100%}
+.trio .frame{width:min(100%,250px);border-radius:20px;padding:4px;box-shadow:6px 6px 0 var(--yellow)}
+.trio .frame img{border-radius:16px}
+.trio figcaption{font-weight:700;text-align:center;font-size:.95rem}
+@media(min-width:700px){.trio .frame{border-radius:38px;padding:8px;box-shadow:12px 12px 0 var(--yellow)}.trio .frame img{border-radius:31px}.trio figcaption{font-size:1.1rem}}
+
+.steps{background:var(--cyan)}
+.steps h2{margin-bottom:12px}
+.steps ol{list-style:none;counter-reset:s;margin:36px 0 0;padding:0;display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.steps li{counter-increment:s;background:var(--white);border:3px solid var(--ink);border-radius:20px;padding:20px;box-shadow:6px 6px 0 var(--yellow);display:grid;gap:8px;align-content:start}
+.steps li::before{content:counter(s);display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--yellow);border:3px solid var(--ink);font-weight:800;font-size:1.2rem}
+.steps li b{font-size:1.1rem}
+.steps .note{margin-top:30px;max-width:42em;font-weight:600}
+
+.private{background:var(--ink);color:var(--white)}
+.private h2{color:var(--white);margin-bottom:34px}
+.private dl{display:grid;gap:28px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin:0}
+.private dt{color:var(--yellow);font-weight:800;font-size:1.3rem}
+.private dd{margin:6px 0 0}
+
+.faq{background:var(--white)}
+.faq h2{margin-bottom:28px}
+.faq details{border-top:3px solid var(--ink);padding:18px 0;max-width:46em}
+.faq details:last-of-type{border-bottom:3px solid var(--ink)}
+.faq summary{font-weight:700;font-size:1.15rem;cursor:pointer}
+.faq details p{margin-top:10px;color:var(--muted)}
+
+.final{background:var(--yellow);text-align:center}
+.final .wrap{display:grid;gap:22px;justify-items:center}
+footer{background:var(--ink);color:var(--white);padding:28px 0;font-size:.95rem}
+footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between}
+footer a{color:var(--white)}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.btn{transition:none}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to the content</a>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="./"><img src="img/icon-192.png" alt="" width="40" height="40">Budget Tracker</a>
+    <a class="btn" href="../">Open the app</a>
+  </div>
+</header>
+
+<main id="main">
+  <div class="hero">
+    <div class="wrap">
+      <div class="hero-text">
+        <h1><span>Tap a bill paid.</span><span>See what’s left.</span></h1>
+        <p class="lede">Budget Tracker is a simple budget tracker that lives on your phone. There is no account, and your budget stays on your device.</p>
+        <div class="cta">
+          <a class="btn" href="../">Open the app</a>
+          <a class="textlink" href="#home-screen">How to add it to your Home Screen</a>
+        </div>
+      </div>
+      <div class="hero-phone frame">
+        <img src="img/first.webp" width="780" height="1688" alt="The Budget Tracker overview: three gauges for bills, money in and spending, with a short month summary underneath.">
+      </div>
+    </div>
+  </div>
+
+  <section class="tabs-band" aria-labelledby="tabs-h">
+    <div class="wrap">
+      <div class="intro">
+        <h2 id="tabs-h">Four tabs along the bottom</h2>
+        <p>Everything is a thumb away. The Overview fits on one screen, so the gauges are never cut off.</p>
+      </div>
+      <div class="tabsimg"><img src="img/tabs.webp" width="780" height="142" alt="The tab bar with Overview, Bills, Spending and Insights." loading="lazy"></div>
+      <dl class="tabnames">
+        <div><dt>Overview</dt><dd>Three gauges and a short summary, all on one fixed screen.</dd></div>
+        <div><dt>Bills</dt><dd>Income and bills, with filters and a weekly schedule.</dd></div>
+        <div><dt>Spending</dt><dd>Everyday budgets like groceries, and what is left of each.</dd></div>
+        <div><dt>Insights</dt><dd>Expected income, where the money goes, and a six-month chart.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="feature" aria-labelledby="f1">
+    <div class="wrap">
+      <div class="text">
+        <h2 id="f1">Tap a bill paid</h2>
+        <p>Switch a bill on when you pay it. Today’s date fills in for you. If you paid on another day, or a different amount, change it right there.</p>
+        <ul class="facts"><li>Bills due soon are tagged, and late ones turn red.</li><li>Everyday spending has its own box: type what you have spent so far.</li></ul>
+      </div>
+      <div class="shot pane"><img src="img/paid.webp" width="780" height="1044" alt="A list of bills. Two are marked paid with the date and amount filled in, and the next ones are still switched off." loading="lazy"></div>
+    </div>
+  </section>
+
+  <section class="feature alt flip" aria-labelledby="f2">
+    <div class="wrap">
+      <div class="text">
+        <h2 id="f2">Filter to what’s left</h2>
+        <p>Choose All, Unpaid, Paid or Overdue. Each one shows how many items it holds, so you can see what still needs paying at a glance.</p>
+        <ul class="facts"><li>A red badge on the Bills tab counts overdue bills.</li><li>The app remembers the filter you chose.</li></ul>
+      </div>
+      <div class="shot frame"><img src="img/filter.webp" width="780" height="1688" alt="The Bills tab with the Unpaid filter selected, showing one overdue bill tagged in red and the next bills due." loading="lazy"></div>
+    </div>
+  </section>
+
+  <section class="feature" aria-labelledby="f3">
+    <div class="wrap">
+      <div class="text">
+        <h2 id="f3">Plan the week</h2>
+        <p>Switch Bills from List to Schedule to see every bill and paycheck by week of the month. The current week is outlined, and the colors show what is paid, due soon or overdue.</p>
+      </div>
+      <div class="shot pane"><img src="img/schedule.webp" width="780" height="1116" alt="The Schedule view: weekly cards listing each bill and paycheck by day, with the current week outlined." loading="lazy"></div>
+    </div>
+  </section>
+
+  <section class="looks" aria-labelledby="f4">
+    <div class="wrap">
+      <div class="intro">
+        <h2 id="f4">Make it look like yours</h2>
+        <p>Pick one of six ready-made color sets, or choose your own three colors. Text colors adjust so everything stays easy to read. Use light, dark, or follow your phone.</p>
+      </div>
+      <div class="trio">
+        <figure><div class="frame"><img src="img/pal_cyan.webp" width="780" height="1688" alt="The overview in the default cyan and yellow." loading="lazy"></div><figcaption>Cyan and Yellow</figcaption></figure>
+        <figure><div class="frame"><img src="img/pal_sunset.webp" width="780" height="1688" alt="The same overview in the Sunset colors." loading="lazy"></div><figcaption>Sunset</figcaption></figure>
+        <figure><div class="frame"><img src="img/pal_berry.webp" width="780" height="1688" alt="The same overview in the Berry colors, in dark mode." loading="lazy"></div><figcaption>Berry, in dark mode</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="feature alt" aria-labelledby="f5">
+    <div class="wrap">
+      <div class="text">
+        <h2 id="f5">Share it, or keep a copy</h2>
+        <p>Send your setup, or your whole budget with its paid history, as a link. The other person gets a confirmation before anything is added. You can also save a backup file from the menu.</p>
+        <p class="facts" style="list-style:none;padding:0">On iPhone, copy the link rather than tapping it, then import it from inside the app.</p>
+      </div>
+      <div class="shot pane"><img src="img/share.webp" width="780" height="578" alt="The Share sheet with two choices: Share setup and Share with paid history." loading="lazy"></div>
+    </div>
+  </section>
+
+  <section class="steps" id="home-screen" aria-labelledby="hs">
+    <div class="wrap">
+      <h2 id="hs">Add it to your Home Screen</h2>
+      <p class="lede">It opens like an app, with its own icon.</p>
+      <ol>
+        <li><b>Open the link in Safari</b><span>Use the Open the app button on this page.</span></li>
+        <li><b>Tap Share</b><span>It is in Safari’s toolbar.</span></li>
+        <li><b>Choose Add to Home Screen</b><span>Scroll the share menu, then tap Add.</span></li>
+        <li><b>Open it from the new icon</b><span>Use the icon every time.</span></li>
+      </ol>
+      <p class="note">Safari and the Home Screen icon keep separate copies of your data, so always open Budget Tracker from the icon once you have added it.</p>
+    </div>
+  </section>
+
+  <section class="private" aria-labelledby="pv">
+    <div class="wrap">
+      <h2 id="pv">Your budget stays yours</h2>
+      <dl>
+        <div><dt>No account</dt><dd>Open it and start. There is nothing to sign up for.</dd></div>
+        <div><dt>Nothing uploaded</dt><dd>Your budgets are saved on your own device.</dd></div>
+        <div><dt>Yours to back up</dt><dd>Save a backup file from the menu, or share a budget as a link when you choose to.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="faq" aria-labelledby="fq">
+    <div class="wrap">
+      <h2 id="fq">Questions</h2>
+      <details><summary>Do I need an account?</summary><p>No. There is no sign-up and no login.</p></details>
+      <details><summary>Where is my budget stored?</summary><p>On your device. Clearing your browser’s website data, or deleting the app, can erase your budgets, so save a backup file from the menu before big changes.</p></details>
+      <details><summary>Can I use it on more than one phone?</summary><p>Not automatically, because nothing is synced. Use Share with paid history, or a backup file, to move a budget to another phone.</p></details>
+      <details><summary>Who can see my budget?</summary><p>Only people you send a link or a backup file to. A shared link contains the budget itself, so send it to people you trust and delete the message afterwards.</p></details>
+      <details><summary>Can I change the colors?</summary><p>Yes. Open the menu, then Colors. Choose a ready-made set or pick your own, and switch between light, dark and automatic.</p></details>
+    </div>
+  </section>
+
+  <section class="final" aria-labelledby="fn">
+    <div class="wrap">
+      <h2 id="fn">Try it on your phone</h2>
+      <p class="lede">Open it, tap a bill paid, and see what’s left.</p>
+      <a class="btn dark" href="../">Open the app</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Budget Tracker. Your budget stays on your device.</span>
+    <a href="../">Open the app</a>
+  </div>
+</footer>
+</body>
+</html>
