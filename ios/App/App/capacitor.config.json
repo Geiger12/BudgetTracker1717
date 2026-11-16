@@ -1,0 +1,16 @@
+{
+	"appId": "com.tapbudget.app",
+	"appName": "TapBudget",
+	"webDir": "www",
+	"ios": {
+		"contentInset": "never",
+		"backgroundColor": "#2ebfd9"
+	},
+	"packageClassList": [
+		"BiometricAuthNative",
+		"AppPlugin",
+		"HapticsPlugin",
+		"LocalNotificationsPlugin",
+		"PreferencesPlugin"
+	]
+}
