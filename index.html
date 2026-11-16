@@ -385,7 +385,7 @@ section.group, #schedule:not(:empty), #planned:not(:empty) { margin-top:var(--s4
     <section id="planned"></section>
   </div>
   <input type="file" id="restoreFile" accept="application/json,.json" hidden>
-  <p class="sub foot-note">Your budgets are saved on this device only. Open the menu to add items, share, import or back up. <a data-ext href="https://geiger12.github.io/BudgetTracker17/about/privacy.html" target="_blank" rel="noopener">Privacy policy</a> · <a data-ext href="https://geiger12.github.io/BudgetTracker17/about/support.html" target="_blank" rel="noopener">Support</a></p>
+  <p class="sub foot-note">Your budgets are saved on this device only. Open the menu to add items, share, import or back up. <a data-ext href="about/privacy.html" target="_blank" rel="noopener">Privacy policy</a> · <a data-ext href="about/support.html" target="_blank" rel="noopener">Support</a></p>
 </div>
 
 <nav class="tabbar" id="tabbar" aria-label="Sections"><div class="tabbar-in" id="tabbarIn"></div></nav>
@@ -800,9 +800,10 @@ section.group, #schedule:not(:empty), #planned:not(:empty) { margin-top:var(--s4
   function setTheme(t) { try { localStorage.setItem(THEME_KEY, t); } catch (e) { /* keep going without saving */ } applyTheme(); render(); }
 
   /* ---------- pages on the About site (open in the browser, not inside the app) ---------- */
-  const SITE = "https://geiger12.github.io/BudgetTracker17/about/";
+  const SITE_WEB = "https://tapbudget-ashy.vercel.app/";                                   // used inside the iPhone app, where there is no web address of its own
+  const sitePage = (p) => (/^https?:$/.test(location.protocol) ? new URL(p, location.href).href : SITE_WEB + p);
   function openPage(url) { if (state.drawer) setDrawer(false); window.open(url, "_blank", "noopener"); }
-  document.addEventListener("click", (e) => { const a = e.target.closest && e.target.closest("a[data-ext]"); if (a) { e.preventDefault(); openPage(a.href); } });
+  document.addEventListener("click", (e) => { const a = e.target.closest && e.target.closest("a[data-ext]"); if (a) { e.preventDefault(); openPage(sitePage(a.getAttribute("href"))); } });
 
   let toastTimer = null;
   function showToast(msg) { if (!msg) return; const t = $("toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 4200); }
@@ -860,9 +861,9 @@ section.group, #schedule:not(:empty), #planned:not(:empty) { margin-top:var(--s4
         h("h2", {}, "Appearance"), seg,
         item("palette", "Colors…", () => openSheet("theme"), { id: "menuColors", right: h("span", { class: "dots", "aria-hidden": "true" }, [col.brand, col.primary, col.accent].map((c) => h("i", { style: "background:" + c })), ) }),
         h("h2", {}, "About"),
-        item("info", "About TapBudget", () => openPage(SITE), { id: "menuAbout" }),
-        item("shield", "Privacy policy", () => openPage(SITE + "privacy.html"), { id: "menuPrivacy" }),
-        item("help", "Support", () => openPage(SITE + "support.html"), { id: "menuSupport" }),
+        item("info", "About TapBudget", () => openPage(sitePage("about/")), { id: "menuAbout" }),
+        item("shield", "Privacy policy", () => openPage(sitePage("about/privacy.html")), { id: "menuPrivacy" }),
+        item("help", "Support", () => openPage(sitePage("about/support.html")), { id: "menuSupport" }),
         h("p", { class: "sub drawer-note" }, "Your budgets are saved on this device only.")));
   }
 
