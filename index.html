@@ -356,22 +356,21 @@ section.group, #schedule:not(:empty), #planned:not(:empty) { margin-top:var(--s4
 .sw.lock.on { background:var(--success-soft); color:var(--success-text); box-shadow:inset 0 0 0 1.5px var(--success-text); }
 .lockmark { display:inline-grid; place-items:center; flex:none; color:var(--text-muted); }
 
-/* ===== loans: slim bars on the Overview ===== */
+/* ===== loans and cards: slim bars on the Overview ===== */
 .loans { padding:var(--s2) var(--s3); }
 .loans:empty { display:none; }
 .lhead { display:flex; align-items:center; justify-content:space-between; gap:var(--s2); font-size:var(--fs-sm); }
 .linkbtn { border:0; background:transparent; min-height:36px; padding:0 var(--s2); color:var(--text); font-size:var(--fs-xs); font-weight:600; text-decoration:underline; border-radius:var(--r-sm); }
-.loan + .loan { margin-top:var(--s2); padding-top:var(--s2); border-top:1px solid var(--border); }
-.ltop { display:flex; justify-content:space-between; align-items:baseline; gap:var(--s2); font-size:var(--fs-sm); }
-.lname { font-weight:650; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.lsub { color:var(--text-muted); font-size:var(--fs-xs); white-space:nowrap; }
-.lrow { display:grid; grid-template-columns:58px minmax(0, 1fr) auto; gap:var(--s2); align-items:center; font-size:var(--fs-xs); margin-top:3px; }
-.ll { color:var(--text-muted); }
-.lv { font-variant-numeric:tabular-nums; font-weight:600; min-width:68px; text-align:right; white-space:nowrap; }
+.dline { display:grid; grid-template-columns:minmax(0, 28%) minmax(0, 1fr) auto; column-gap:var(--s2); row-gap:4px; align-items:center; font-size:var(--fs-xs); }
+.lhead + .dline { margin-top:2px; }
+.dline + .dline { margin-top:var(--s2); padding-top:var(--s2); border-top:1px solid var(--border); }
+.dname { font-weight:650; font-size:13px; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.dline.loanline .dname { grid-row:span 2; }
+.lv { font-variant-numeric:tabular-nums; font-weight:600; min-width:72px; text-align:right; white-space:nowrap; }
 .lbar { height:6px; background:var(--track); border-radius:var(--r-pill); overflow:hidden; }
 .lbar > i { display:block; height:100%; border-radius:var(--r-pill); }
-#view-overview.l3 .loan:nth-child(n+3), #view-overview.l3 .lhead .linkbtn { display:none; }
-#view-overview.l4 .loan .lpay { display:none; }
+#view-overview.l3 .dline:nth-child(n+4), #view-overview.l3 .lhead .linkbtn { display:none; }
+#view-overview.l4 .loanline .lbar:nth-of-type(2), #view-overview.l4 .lpay { display:none; }
 
 /* ===== settings tab ===== */
 .lactions { display:flex; gap:var(--s2); flex-wrap:wrap; margin-top:var(--s2); }
@@ -486,6 +485,7 @@ section.group, #schedule:not(:empty), #planned:not(:empty) { margin-top:var(--s4
     } catch (e) { state.mode = "local"; }
     if (!state.activeId || !state.budgets[state.activeId]) { state.budgets = {}; state.activeId = uid(); state.budgets[state.activeId] = fresh ? (() => { const it = sampleItems(); return { name: "Example budget", items: it, pay: samplePay(it), loans: sampleLoans(), sample: true }; })() : { name: "My budget", items: [], pay: {} }; }
     if (!fresh && !seeded) { state.budgets[uid()] = exampleBudget(); added = true; }     // existing installs get the example once, so it shows in the list
+    for (const b of Object.values(state.budgets)) if (b.sample) { const have = new Set((b.loans || []).map((l) => l.id)); for (const l of sampleLoans()) if (!have.has(l.id)) { b.loans = (b.loans || []).concat([l]); added = true; } }
     loadActive();
     if (fresh || added) persist();      // keep the example stable from the first visit
   }
@@ -526,9 +526,10 @@ section.group, #schedule:not(:empty), #planned:not(:empty) { margin-top:var(--s4
   }
   function cleanLoan(x) {
     if (!x || typeof x.id !== "string" || !x.id) return null;
-    const total = num(x.total), balance = num(x.balance), payment = num(x.payment), count = num(x.count), paid = num(x.paid);
-    if (total == null || total < 0 || balance == null || balance < 0 || payment == null || payment < 0 || count == null || count < 1 || paid == null || paid < 0) return null;
-    return { id: str(x.id, 80), name: str(x.name, 60) || "Loan", total, balance, payment, count: Math.round(count), paid: Math.min(Math.round(count), Math.round(paid)) };
+    const total = num(x.total), balance = num(x.balance), payment = num(x.payment);
+    if (total == null || total < 0 || balance == null || balance < 0) return null;
+    const card = x.kind === "card";
+    return { id: str(x.id, 80), name: str(x.name, 60) || (card ? "Credit card" : "Loan"), kind: card ? "card" : "loan", total, balance, payment: card || payment == null || payment < 0 ? 0 : payment };
   }
   function cleanPay(raw, items) {
     const out = {};
@@ -673,8 +674,10 @@ section.group, #schedule:not(:empty), #planned:not(:empty) { margin-top:var(--s4
   }
   function sampleLoans() {
     return [
-      { id: "sample-loan-car", name: "Car loan", total: 18000, balance: 11250, payment: 385, paid: 20, count: 48 },
-      { id: "sample-loan-school", name: "Student loan", total: 9000, balance: 3900, payment: 150, paid: 34, count: 60 }
+      { id: "sample-loan-car", name: "Car loan", kind: "loan", total: 18000, balance: 11250, payment: 385 },
+      { id: "sample-loan-school", name: "Student loan", kind: "loan", total: 9000, balance: 3900, payment: 150 },
+      { id: "sample-card-visa", name: "Rewards Visa", kind: "card", total: 6000, balance: 1850, payment: 0 },
+      { id: "sample-card-store", name: "Store card", kind: "card", total: 2500, balance: 2050, payment: 0 }
     ];
   }
   function samplePay(items) {
@@ -794,7 +797,7 @@ section.group, #schedule:not(:empty), #planned:not(:empty) { margin-top:var(--s4
       const loneExample = ids.length === 1 && state.budgets[ids[0]].sample;
       const showMatch = match && !loneExample;
       rh.append(h("div", { class: "panel" }, h("h3", {}, "Import “" + p.name + "”?"),
-        h("p", { class: "sub" }, p.items.length + (p.items.length === 1 ? " item" : " items") + (Object.keys(p.pay).length ? ", " + Object.keys(p.pay).length + " payments recorded" : "") + (p.loans && p.loans.length ? ", " + p.loans.length + (p.loans.length === 1 ? " loan" : " loans") : "")), p.hint ? h("p", { class: "banner" }, p.hint) : null,
+        h("p", { class: "sub" }, p.items.length + (p.items.length === 1 ? " item" : " items") + (Object.keys(p.pay).length ? ", " + Object.keys(p.pay).length + " payments recorded" : "") + (p.loans && p.loans.length ? ", " + p.loans.length + (p.loans.length === 1 ? " loan or card" : " loans and cards") : "")), p.hint ? h("p", { class: "banner" }, p.hint) : null,
         loneExample ? h("p", { class: "sub" }, "This replaces the example budget.") : null,
         h("div", { class: "actions" },
           h("button", { class: "btn primary", onclick: () => applyRestore("new", p.name, "replace") }, showMatch ? "Add as a new budget" : "Import"),
@@ -816,7 +819,7 @@ section.group, #schedule:not(:empty), #planned:not(:empty) { margin-top:var(--s4
         h("button", { class: "btn primary", onclick: () => shareLink(false) }, "Share setup"),
         h("button", { class: "btn", onclick: () => shareLink(true) }, "Share with paid history"),
         h("button", { class: "btn", onclick: () => { state.sharing = false; render(); } }, "Close")),
-      h("p", { class: "sub", style: "margin-top:10px" }, "Setup is your items, amounts and loans. It leaves out what you have marked paid.")));
+      h("p", { class: "sub", style: "margin-top:10px" }, "Setup is your items, amounts, loans and cards. It leaves out what you have marked paid.")));
     const ih = document.getElementById("importHost"); ih.replaceChildren();
     if (state.importOpen) {
       const box = h("textarea", { id: "importText", rows: "3", placeholder: "Paste a budget link here", "aria-label": "Budget link", oninput: (e) => { state.importText = e.target.value; } });
@@ -1200,60 +1203,83 @@ section.group, #schedule:not(:empty), #planned:not(:empty) { margin-top:var(--s4
   const ordinal = (n) => { const q = ["th", "st", "nd", "rd"], v = n % 100; return n + (q[(v - 20) % 10] || q[v] || q[0]); };
   const loanBar = (pct, color, label) => h("div", { class: "lbar", role: "img", "aria-label": label }, h("i", { style: "width:" + (pct > 0 ? Math.max(2, Math.round(pct * 100)) : 0) + "%;background:" + color }));
 
+  const isCard = (l) => l.kind === "card";
+  function loanStats(l) {                                          // payments made and left are worked out from total, balance and payment (interest is not included)
+    const used = l.total > 0 ? clamp01(l.balance / l.total) : 0;
+    if (isCard(l)) return { card: true, used, avail: Math.max(0, l.total - l.balance) };
+    let made = null, count = null;
+    if (l.payment > 0) { made = Math.max(0, Math.round((l.total - l.balance) / l.payment)); count = made + Math.ceil(l.balance / l.payment); }
+    return { card: false, left: used, made, count, done: l.balance <= 0 };
+  }
+
+  function loanLine(l) {                                          // one compact entry on the Overview
+    const st = loanStats(l);
+    if (st.card) {
+      const pct = Math.round(st.used * 100), color = pct >= 90 ? "var(--danger-text)" : pct >= 70 ? "var(--warning-text)" : "var(--primary)";
+      return h("div", { class: "dline" }, h("span", { class: "dname" }, l.name),
+        loanBar(st.used, color, l.name + ": " + fmt(l.balance) + " used of a " + fmt(l.total) + " limit, " + pct + " percent"), h("span", { class: "lv" }, fmt(l.balance) + " used"));
+    }
+    const hasPay = st.count > 0;
+    return h("div", { class: "dline" + (hasPay ? " loanline" : "") }, h("span", { class: "dname" }, l.name),
+      loanBar(st.left, "var(--primary)", l.name + ": " + fmt(l.balance) + " left of " + fmt(l.total)), h("span", { class: "lv" }, st.done ? "Paid off" : fmt(l.balance) + " left"),
+      hasPay ? loanBar(clamp01(st.made / st.count), "var(--success-text)", st.made + " of " + st.count + " payments made") : null,
+      hasPay ? h("span", { class: "lv lpay" }, st.made + " of " + st.count + " paid") : null);
+  }
+
   function renderLoans() {                                        // slim card at the bottom of the Overview
     const host = $("loanHost"); host.replaceChildren();
     if (!state.loans.length) return;
-    const shown = state.loans.slice(0, 2), more = state.loans.length - shown.length;
-    host.append(h("div", { class: "lhead" }, h("b", {}, "Loans"), h("button", { class: "linkbtn", onclick: () => setTab("settings") }, more ? "Manage · " + more + " more" : "Manage")),
-      ...shown.map((l) => {
-        const left = l.total > 0 ? clamp01(l.balance / l.total) : 0, made = clamp01(l.paid / l.count), done = l.balance <= 0;
-        return h("div", { class: "loan" },
-          h("div", { class: "ltop" }, h("span", { class: "lname" }, l.name), done ? h("span", { class: "tag ok" }, "Paid off") : h("span", { class: "lsub" }, fmt(l.payment) + " each")),
-          h("div", { class: "lrow" }, h("span", { class: "ll" }, "Balance"), loanBar(left, "var(--primary)", "Balance: " + fmt(l.balance) + " left of " + fmt(l.total)), h("span", { class: "lv" }, fmt(l.balance) + " left")),
-          h("div", { class: "lrow lpay" }, h("span", { class: "ll" }, "Payments"), loanBar(made, "var(--success-text)", l.paid + " of " + l.count + " payments made"), h("span", { class: "lv" }, l.paid + " of " + l.count)));
-      }));
+    const sorted = state.loans.slice().sort((a, b) => (isCard(a) ? 1 : 0) - (isCard(b) ? 1 : 0)), shown = sorted.slice(0, 4), more = sorted.length - shown.length;
+    host.append(h("div", { class: "lhead" }, h("b", {}, "Loans and cards"), h("button", { class: "linkbtn", onclick: () => setTab("settings") }, more ? "Manage · " + more + " more" : "Manage")), ...shown.map(loanLine));
   }
 
   function loanForm(l) {
     const isNew = !l, f = {};
-    const field = (label, el) => h("label", {}, label, el);
-    const numIn = (v, ph, stp) => h("input", { type: "number", step: stp || "0.01", min: "0", value: v == null ? "" : String(v), placeholder: ph || "" });
-    f.name = h("input", { type: "text", maxlength: "60", placeholder: "e.g. Car loan", value: l ? l.name : "" });
-    f.total = numIn(l && l.total, "0.00"); f.balance = numIn(l && l.balance, "0.00"); f.payment = numIn(l && l.payment, "0.00");
-    f.paid = numIn(l ? l.paid : 0, "0", "1"); f.count = numIn(l && l.count, "e.g. 48", "1");
+    f.kind = h("select", { "aria-label": "Type" }, h("option", { value: "loan" }, "Loan"), h("option", { value: "card" }, "Credit card"));
+    f.kind.value = l && isCard(l) ? "card" : "loan";
+    const num0 = (v, ph) => h("input", { type: "number", step: "0.01", min: "0", inputmode: "decimal", value: v == null ? "" : String(v), placeholder: ph || "0.00" });
+    f.name = h("input", { type: "text", maxlength: "60", value: l ? l.name : "" });
+    f.total = num0(l && l.total); f.balance = num0(l && l.balance); f.payment = num0(l && l.payment && l.payment > 0 ? l.payment : null);
+    const totalText = document.createTextNode(""), payHint = h("span", { class: "sub" }, "Optional. Used to estimate payments left.");
+    const typeF = h("label", {}, "Type", f.kind), totalF = h("label", {}, totalText, f.total), payF = h("label", {}, "Payment amount ($)", f.payment, payHint);
+    typeF.hidden = !isNew;
+    const sync = () => { const card = f.kind.value === "card"; totalText.nodeValue = card ? "Credit limit ($)" : "Total value ($)"; payF.hidden = card; f.name.placeholder = card ? "e.g. Rewards Visa" : "e.g. Car loan"; };
+    f.kind.addEventListener("change", sync);
     const err = h("div", { class: "sub", role: "alert" });
     let armed = false;
     const save = h("button", { class: "btn primary", onclick: () => {
-      const name = f.name.value.trim(), total = parseFloat(f.total.value), balance = parseFloat(f.balance.value), payment = parseFloat(f.payment.value), paid = parseInt(f.paid.value || "0", 10), count = parseInt(f.count.value, 10);
+      const card = f.kind.value === "card", name = f.name.value.trim(), total = parseFloat(f.total.value), balance = parseFloat(f.balance.value), payment = f.payment.value === "" ? 0 : parseFloat(f.payment.value);
       if (!name) { err.textContent = "Please enter a name."; return; }
-      if (isNaN(total) || total <= 0) { err.textContent = "Please enter the original amount."; return; }
-      if (isNaN(balance) || balance < 0) { err.textContent = "Please enter the balance left, or 0 if it is paid off."; return; }
-      if (isNaN(payment) || payment < 0) { err.textContent = "Please enter the payment amount."; return; }
-      if (!(count >= 1)) { err.textContent = "Please enter the total number of payments."; return; }
-      if (isNaN(paid) || paid < 0 || paid > count) { err.textContent = "Payments made must be between 0 and " + count + "."; return; }
+      if (isNaN(total) || total <= 0) { err.textContent = card ? "Please enter the credit limit." : "Please enter the total value."; return; }
+      if (isNaN(balance) || balance < 0) { err.textContent = "Please enter the current balance, or 0 if it is paid off."; return; }
+      if (!card && (isNaN(payment) || payment < 0)) { err.textContent = "Please enter the payment amount, or leave it blank."; return; }
       state.loanEdit = null; state.note = isNew ? "Added “" + name + "”." : "Saved “" + name + "”.";
-      store.setLoan({ id: l ? l.id : "loan-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), name, total, balance, payment, paid, count });
-    } }, isNew ? "Add loan" : "Save loan");
+      store.setLoan({ id: l ? l.id : "loan-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), name, kind: card ? "card" : "loan", total, balance, payment: card ? 0 : payment });
+    } }, isNew ? "Add" : "Save");
     const rm = isNew ? null : h("button", { class: "btn danger", onclick: () => { if (!armed) { armed = true; rm.textContent = "Tap again to remove"; return; } state.loanEdit = null; store.delLoan(l.id); } }, "Remove");
-    return h("div", {}, h("div", { class: "fields" }, field("Name", f.name), field("Original amount ($)", f.total), field("Balance left ($)", f.balance), field("Payment amount ($)", f.payment), field("Payments made", f.paid), field("Total payments", f.count)),
+    const form = h("div", {}, h("div", { class: "fields" }, typeF, h("label", {}, "Name", f.name), totalF, h("label", {}, "Current balance ($)", f.balance), payF),
       err, h("div", { class: "actions" }, save, h("button", { class: "btn", onclick: () => { state.loanEdit = null; render(); } }, "Cancel"), rm));
+    sync();
+    return form;
   }
 
   function loanItem(l) {
     if (state.loanEdit === l.id) return h("div", { class: "row" }, loanForm(l));
-    const done = l.balance <= 0;
+    const st = loanStats(l), card = st.card;
     let pay = null;
     if (state.loanPay === l.id) {
-      const inp = h("input", { type: "number", step: "0.01", min: "0", value: String(Math.max(0, +(l.balance - l.payment).toFixed(2))), "aria-label": "Balance after this payment" });
-      pay = h("div", { class: "detail", style: "margin-left:0" }, h("label", {}, "Balance after this payment ($)", inp),
-        h("button", { class: "btn small primary", onclick: () => { const v = parseFloat(inp.value); if (isNaN(v) || v < 0) return; state.loanPay = null; state.note = "Payment recorded for “" + l.name + "”."; store.setLoan({ ...l, balance: v, paid: Math.min(l.count, l.paid + 1) }); } }, "Save"),
+      const inp = h("input", { type: "number", step: "0.01", min: "0", inputmode: "decimal", value: String(card ? l.balance : Math.max(0, +(l.balance - l.payment).toFixed(2))), "aria-label": card ? "New balance" : "Balance after this payment" });
+      pay = h("div", { class: "detail", style: "margin-left:0" }, h("label", {}, card ? "New balance ($)" : "Balance after this payment ($)", inp),
+        h("button", { class: "btn small primary", onclick: () => { const v = parseFloat(inp.value); if (isNaN(v) || v < 0) return; state.loanPay = null; state.note = (card ? "Balance updated for “" : "Payment recorded for “") + l.name + "”."; store.setLoan({ ...l, balance: v }); } }, "Save"),
         h("button", { class: "btn small", onclick: () => { state.loanPay = null; render(); } }, "Cancel"));
     }
+    const meta = card
+      ? [h("span", {}, fmt(l.balance) + " used of " + fmt(l.total)), h("span", {}, fmt(st.avail) + " available")]
+      : [h("span", {}, fmt(l.balance) + " left of " + fmt(l.total)), st.count > 0 && !st.done ? h("span", {}, "about " + (st.count - st.made) + " payments left") : null, l.payment > 0 ? h("span", {}, fmt(l.payment) + " each") : null, st.done ? h("span", { class: "tag ok" }, "Paid off") : null];
     return h("div", { class: "row" },
-      h("div", { class: "main" }, h("div", { class: "name" }, l.name),
-        h("div", { class: "meta" }, h("span", {}, fmt(l.balance) + " left of " + fmt(l.total)), h("span", {}, l.paid + " of " + l.count + " payments"), h("span", {}, fmt(l.payment) + " each"), done ? h("span", { class: "tag ok" }, "Paid off") : null)),
+      h("div", { class: "main" }, h("div", { class: "name" }, l.name, " ", h("span", { class: "tag" }, card ? "Card" : "Loan")), h("div", { class: "meta" }, meta)),
       h("div", { class: "lactions" },
-        done ? null : h("button", { class: "btn small primary", onclick: () => { state.loanPay = l.id; state.loanEdit = null; render(); } }, "Record a payment"),
+        st.done ? null : h("button", { class: "btn small primary", onclick: () => { state.loanPay = l.id; state.loanEdit = null; render(); } }, card ? "Update balance" : "Record a payment"),
         h("button", { class: "btn small", onclick: () => { state.loanEdit = l.id; state.loanPay = null; render(); } }, "Edit")),
       pay);
   }
@@ -1276,13 +1302,15 @@ section.group, #schedule:not(:empty), #planned:not(:empty) { margin-top:var(--s4
     });
     const loanRows = state.loans.map(loanItem);
     if (state.loanEdit === "new") loanRows.push(h("div", { class: "row" }, loanForm(null)));
-    if (!loanRows.length) loanRows.push(h("div", { class: "empty" }, "No loans yet. Add one to see its balance and payments on the Overview."));
+    if (!loanRows.length) loanRows.push(h("div", { class: "empty" }, "Nothing here yet. Add a loan or credit card to see its balance on the Overview."));
+    const nCards = state.loans.filter(isCard).length, nLoans = state.loans.length - nCards;
+    const loanCount = [nLoans ? nLoans + (nLoans === 1 ? " loan" : " loans") : null, nCards ? nCards + (nCards === 1 ? " card" : " cards") : null].filter(Boolean).join(" · ");
     const mi = (icon, label, fn) => h("button", { class: "menu-item", onclick: fn }, ico(icon), h("span", { class: "grow" }, label));
     host.append(
       h("p", { class: "sub", style: "margin-top:12px" }, "Switch on bills that come out by themselves. They are marked paid on the due day and show a lock instead of a switch."),
       group("Automatic bills", autoRows.length ? autoRows : [h("div", { class: "empty" }, "Add a bill first, then come back to make it automatic.")], cand.length ? onCount + " of " + cand.length + " automatic" : null),
-      group("Loans", loanRows, state.loans.length ? state.loans.length + (state.loans.length === 1 ? " loan" : " loans") : null),
-      state.loanEdit === "new" ? null : h("div", { class: "actions" }, h("button", { class: "btn primary", onclick: () => { state.loanEdit = "new"; state.loanPay = null; render(); } }, "Add a loan")),
+      group("Loans and cards", loanRows, loanCount || null),
+      state.loanEdit === "new" ? null : h("div", { class: "actions" }, h("button", { class: "btn primary", onclick: () => { state.loanEdit = "new"; state.loanPay = null; render(); } }, "Add a loan or card")),
       group("Appearance and data", [mi("palette", "Colors…", () => openSheet("theme")), mi("folder", "Manage budgets…", () => openSheet("manage")), mi("share", "Share this budget", () => openSheet("share")), mi("download", "Save a backup file", backup)]));
   }
 
