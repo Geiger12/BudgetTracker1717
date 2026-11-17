@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>Budget Tracker</title>
+<title>TapBudget</title>
 <meta name="description" content="Track which bills you have paid, and when.">
 <meta name="theme-color" content="#2ebfd9" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#12212a" media="(prefers-color-scheme: dark)">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Budget">
+<meta name="apple-mobile-web-app-title" content="TapBudget">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png" type="image/png">
@@ -372,6 +372,17 @@ section.group, #schedule:not(:empty), #planned:not(:empty) { margin-top:var(--s4
 #view-overview.l3 .dline:nth-child(n+4), #view-overview.l3 .lhead .linkbtn { display:none; }
 #view-overview.l4 .loanline .lbar:nth-of-type(2), #view-overview.l4 .lpay { display:none; }
 
+
+/* ===== debt balance prediction (bottom of Insights) ===== */
+#debts:not(:empty) { margin-top:var(--s4); }
+.dsum { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:var(--s3); padding:var(--s3) var(--s4) var(--s1); }
+.dsum .l { color:var(--text-muted); font-size:var(--fs-xs); }
+.dsum .v { font-size:20px; font-weight:700; font-variant-numeric:tabular-nums; }
+.dsum .v.pos { color:var(--success-text); }
+@media (max-width:560px) { .dsum { gap:var(--s2); padding:var(--s3); } .dsum .v { font-size:17px; } }
+.dchart { padding:var(--s2) var(--s3) var(--s3); }
+.dnote { margin:0; padding:var(--s3) var(--s4); border-top:1px solid var(--border); }
+
 /* ===== settings tab ===== */
 .lactions { display:flex; gap:var(--s2); flex-wrap:wrap; margin-top:var(--s2); }
 .list .menu-item { border-radius:0; padding:var(--s2) var(--s4); }
@@ -384,7 +395,7 @@ section.group, #schedule:not(:empty), #planned:not(:empty) { margin-top:var(--s4
 <header class="appbar">
   <div class="appbar-in">
     <button class="iconbtn" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="drawer"></button>
-    <div class="titles"><h1>Budget Tracker</h1><p class="sub" id="appSub"></p></div>
+    <div class="titles"><h1>TapBudget</h1><p class="sub" id="appSub"></p></div>
     <button class="btn accent small" id="appAdd" aria-label="Add item"></button>
   </div>
 </header>
@@ -413,6 +424,7 @@ section.group, #schedule:not(:empty), #planned:not(:empty) { margin-top:var(--s4
     <div class="glance" id="glance"></div>
     <section id="where"></section>
     <section id="planned"></section>
+    <section id="debts"></section>
   </div>
   <div class="view" id="view-settings" hidden>
     <div id="settingsHost"></div>
@@ -426,7 +438,7 @@ section.group, #schedule:not(:empty), #planned:not(:empty) { margin-top:var(--s4
 <div class="scrim" id="scrim"></div>
 <aside class="drawer" id="drawer" aria-label="Menu" aria-hidden="true" tabindex="-1"></aside>
 <div class="sheet-wrap" id="sheetWrap" hidden>
-  <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Budget Tracker" tabindex="-1">
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="TapBudget" tabindex="-1">
     <div class="sheet-grab"></div>
     <button class="iconbtn sheet-close" id="sheetClose" aria-label="Close"></button>
     <div id="addHost"></div>
@@ -485,7 +497,7 @@ section.group, #schedule:not(:empty), #planned:not(:empty) { margin-top:var(--s4
     } catch (e) { state.mode = "local"; }
     if (!state.activeId || !state.budgets[state.activeId]) { state.budgets = {}; state.activeId = uid(); state.budgets[state.activeId] = fresh ? (() => { const it = sampleItems(); return { name: "Example budget", items: it, pay: samplePay(it), loans: sampleLoans(), sample: true }; })() : { name: "My budget", items: [], pay: {} }; }
     if (!fresh && !seeded) { state.budgets[uid()] = exampleBudget(); added = true; }     // existing installs get the example once, so it shows in the list
-    for (const b of Object.values(state.budgets)) if (b.sample) { const have = new Set((b.loans || []).map((l) => l.id)); for (const l of sampleLoans()) if (!have.has(l.id)) { b.loans = (b.loans || []).concat([l]); added = true; } }
+    for (const b of Object.values(state.budgets)) if (b.sample) { const have = new Set((b.loans || []).map((l) => l.id)); for (const l of sampleLoans()) { if (!have.has(l.id)) { b.loans = (b.loans || []).concat([l]); added = true; } else if (l.kind === "card") { const cur = b.loans.find((x) => x.id === l.id); if (cur && !(cur.payment > 0)) { cur.payment = l.payment; added = true; } } } }
     loadActive();
     if (fresh || added) persist();      // keep the example stable from the first visit
   }
@@ -529,7 +541,7 @@ section.group, #schedule:not(:empty), #planned:not(:empty) { margin-top:var(--s4
     const total = num(x.total), balance = num(x.balance), payment = num(x.payment);
     if (total == null || total < 0 || balance == null || balance < 0) return null;
     const card = x.kind === "card";
-    return { id: str(x.id, 80), name: str(x.name, 60) || (card ? "Credit card" : "Loan"), kind: card ? "card" : "loan", total, balance, payment: card || payment == null || payment < 0 ? 0 : payment };
+    return { id: str(x.id, 80), name: str(x.name, 60) || (card ? "Credit card" : "Loan"), kind: card ? "card" : "loan", total, balance, payment: payment == null || payment < 0 ? 0 : payment };
   }
   function cleanPay(raw, items) {
     const out = {};
@@ -608,7 +620,7 @@ section.group, #schedule:not(:empty), #planned:not(:empty) { margin-top:var(--s4
   }
   async function shareLink(withHistory) {
     const link = await makeLink(withHistory);
-    if (navigator.share) { try { await navigator.share({ title: curName() + " budget", text: "Budget Tracker: " + curName(), url: link }); return; } catch (e) { if (e && e.name === "AbortError") return; } }
+    if (navigator.share) { try { await navigator.share({ title: curName() + " budget", text: "TapBudget: " + curName(), url: link }); return; } catch (e) { if (e && e.name === "AbortError") return; } }
     copyText(link, "Link copied. Paste it into the app on your other device.");
   }
 
@@ -676,8 +688,8 @@ section.group, #schedule:not(:empty), #planned:not(:empty) { margin-top:var(--s4
     return [
       { id: "sample-loan-car", name: "Car loan", kind: "loan", total: 18000, balance: 11250, payment: 385 },
       { id: "sample-loan-school", name: "Student loan", kind: "loan", total: 9000, balance: 3900, payment: 150 },
-      { id: "sample-card-visa", name: "Rewards Visa", kind: "card", total: 6000, balance: 1850, payment: 0 },
-      { id: "sample-card-store", name: "Store card", kind: "card", total: 2500, balance: 2050, payment: 0 }
+      { id: "sample-card-visa", name: "Rewards Visa", kind: "card", total: 6000, balance: 1850, payment: 150 },
+      { id: "sample-card-store", name: "Store card", kind: "card", total: 2500, balance: 2050, payment: 50 }
     ];
   }
   function samplePay(items) {
@@ -752,7 +764,7 @@ section.group, #schedule:not(:empty), #planned:not(:empty) { margin-top:var(--s4
   }
 
   function renderBudgets() {
-    document.title = curName() + " · Budget Tracker";
+    document.title = curName() + " · TapBudget";
     const ids = Object.keys(state.budgets).sort((a, b) => state.budgets[a].name.localeCompare(state.budgets[b].name));
     const bar = document.getElementById("budgetCell"); bar.replaceChildren();
     const sel = h("select", { id: "budgetSel", "aria-label": "Choose budget" }, ids.map((id) => h("option", { value: id }, state.budgets[id].name)));
@@ -814,7 +826,7 @@ section.group, #schedule:not(:empty), #planned:not(:empty) { margin-top:var(--s4
   function renderShareImport() {
     const sh = document.getElementById("shareHost"); sh.replaceChildren();
     if (state.sharing) sh.append(h("div", { class: "panel" }, h("h3", {}, "Share “" + curName() + "”"),
-      h("p", { class: "sub" }, "Send a link. The other person copies it, opens Budget Tracker and taps Import."),
+      h("p", { class: "sub" }, "Send a link. The other person copies it, opens TapBudget and taps Import."),
       h("div", { class: "actions" },
         h("button", { class: "btn primary", onclick: () => shareLink(false) }, "Share setup"),
         h("button", { class: "btn", onclick: () => shareLink(true) }, "Share with paid history"),
@@ -901,7 +913,7 @@ section.group, #schedule:not(:empty), #planned:not(:empty) { margin-top:var(--s4
     const theme = getTheme(), col = getColors();
     const seg = h("div", { class: "seg", role: "group", "aria-label": "Theme" }, [["auto", "Auto"], ["light", "Light"], ["dark", "Dark"]].map(([v, l]) => h("button", { "aria-pressed": String(theme === v), onclick: () => setTheme(v) }, l)));
     d.append(
-      h("div", { class: "drawer-head" }, h("div", {}, h("div", { class: "drawer-title" }, "Budget Tracker"), h("div", { class: "drawer-sub" }, "Menu")), h("button", { class: "iconbtn", "aria-label": "Close menu", onclick: () => setDrawer(false) }, ico("close"))),
+      h("div", { class: "drawer-head" }, h("div", {}, h("div", { class: "drawer-title" }, "TapBudget"), h("div", { class: "drawer-sub" }, "Menu")), h("button", { class: "iconbtn", "aria-label": "Close menu", onclick: () => setDrawer(false) }, ico("close"))),
       h("div", { class: "drawer-body" },
         h("h2", {}, "Budgets"),
         ids.map((id) => item(id === state.activeId ? "check" : "circle", state.budgets[id].name, () => { setDrawer(false); switchTo(id); }, { active: id === state.activeId, right: h("span", { class: "count" }, String((id === state.activeId ? state.items : state.budgets[id].items || []).length)) })),
@@ -1070,6 +1082,7 @@ section.group, #schedule:not(:empty), #planned:not(:empty) { margin-top:var(--s4
     renderBillsView(ctx);
     renderSpendingView(ctx);
     renderInsights(ctx);
+    renderDebts();
     renderSettings();
     renderAdd();
     renderChrome();
@@ -1240,10 +1253,10 @@ section.group, #schedule:not(:empty), #planned:not(:empty) { margin-top:var(--s4
     const num0 = (v, ph) => h("input", { type: "number", step: "0.01", min: "0", inputmode: "decimal", value: v == null ? "" : String(v), placeholder: ph || "0.00" });
     f.name = h("input", { type: "text", maxlength: "60", value: l ? l.name : "" });
     f.total = num0(l && l.total); f.balance = num0(l && l.balance); f.payment = num0(l && l.payment && l.payment > 0 ? l.payment : null);
-    const totalText = document.createTextNode(""), payHint = h("span", { class: "sub" }, "Optional. Used to estimate payments left.");
-    const typeF = h("label", {}, "Type", f.kind), totalF = h("label", {}, totalText, f.total), payF = h("label", {}, "Payment amount ($)", f.payment, payHint);
+    const totalText = document.createTextNode(""), payText = document.createTextNode(""), payHintText = document.createTextNode(""), payHint = h("span", { class: "sub" }, payHintText);
+    const typeF = h("label", {}, "Type", f.kind), totalF = h("label", {}, totalText, f.total), payF = h("label", {}, payText, f.payment, payHint);
     typeF.hidden = !isNew;
-    const sync = () => { const card = f.kind.value === "card"; totalText.nodeValue = card ? "Credit limit ($)" : "Total value ($)"; payF.hidden = card; f.name.placeholder = card ? "e.g. Rewards Visa" : "e.g. Car loan"; };
+    const sync = () => { const card = f.kind.value === "card"; totalText.nodeValue = card ? "Credit limit ($)" : "Total value ($)"; payText.nodeValue = card ? "Monthly payment ($)" : "Payment amount ($)"; payHintText.nodeValue = card ? "Optional. Used to project your balance." : "Optional. Used to estimate payments left."; f.name.placeholder = card ? "e.g. Rewards Visa" : "e.g. Car loan"; };
     f.kind.addEventListener("change", sync);
     const err = h("div", { class: "sub", role: "alert" });
     let armed = false;
@@ -1252,9 +1265,9 @@ section.group, #schedule:not(:empty), #planned:not(:empty) { margin-top:var(--s4
       if (!name) { err.textContent = "Please enter a name."; return; }
       if (isNaN(total) || total <= 0) { err.textContent = card ? "Please enter the credit limit." : "Please enter the total value."; return; }
       if (isNaN(balance) || balance < 0) { err.textContent = "Please enter the current balance, or 0 if it is paid off."; return; }
-      if (!card && (isNaN(payment) || payment < 0)) { err.textContent = "Please enter the payment amount, or leave it blank."; return; }
+      if (isNaN(payment) || payment < 0) { err.textContent = "Please enter the payment amount, or leave it blank."; return; }
       state.loanEdit = null; state.note = isNew ? "Added “" + name + "”." : "Saved “" + name + "”.";
-      store.setLoan({ id: l ? l.id : "loan-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), name, kind: card ? "card" : "loan", total, balance, payment: card ? 0 : payment });
+      store.setLoan({ id: l ? l.id : "loan-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), name, kind: card ? "card" : "loan", total, balance, payment });
     } }, isNew ? "Add" : "Save");
     const rm = isNew ? null : h("button", { class: "btn danger", onclick: () => { if (!armed) { armed = true; rm.textContent = "Tap again to remove"; return; } state.loanEdit = null; store.delLoan(l.id); } }, "Remove");
     const form = h("div", {}, h("div", { class: "fields" }, typeF, h("label", {}, "Name", f.name), totalF, h("label", {}, "Current balance ($)", f.balance), payF),
@@ -1274,7 +1287,7 @@ section.group, #schedule:not(:empty), #planned:not(:empty) { margin-top:var(--s4
         h("button", { class: "btn small", onclick: () => { state.loanPay = null; render(); } }, "Cancel"));
     }
     const meta = card
-      ? [h("span", {}, fmt(l.balance) + " used of " + fmt(l.total)), h("span", {}, fmt(st.avail) + " available")]
+      ? [h("span", {}, fmt(l.balance) + " used of " + fmt(l.total)), h("span", {}, fmt(st.avail) + " available"), l.payment > 0 ? h("span", {}, fmt(l.payment) + " a month") : null]
       : [h("span", {}, fmt(l.balance) + " left of " + fmt(l.total)), st.count > 0 && !st.done ? h("span", {}, "about " + (st.count - st.made) + " payments left") : null, l.payment > 0 ? h("span", {}, fmt(l.payment) + " each") : null, st.done ? h("span", { class: "tag ok" }, "Paid off") : null];
     return h("div", { class: "row" },
       h("div", { class: "main" }, h("div", { class: "name" }, l.name, " ", h("span", { class: "tag" }, card ? "Card" : "Loan")), h("div", { class: "meta" }, meta)),
@@ -1284,7 +1297,65 @@ section.group, #schedule:not(:empty), #planned:not(:empty) { margin-top:var(--s4
       pay);
   }
 
-  /* ---------- settings tab ---------- */
+    /* ---------- debt balance prediction ---------- */
+  const debtAt = (l, k) => Math.max(0, l.balance - (l.payment > 0 ? l.payment : 0) * Math.max(0, k));   // k months after this one; no interest, no new spending
+  function chartDebt(vals, labels, mark) {
+    const W = Math.max(280, Math.min(900, window.innerWidth - 32 - 30)), H = 210, L = 54, R = 16, T = 36, B = 26;
+    const maxV = Math.max(1, ...vals), raw = maxV / 4, pw = Math.pow(10, Math.floor(Math.log10(raw)));
+    const stepV = [1, 2, 2.5, 5, 10].map((c) => c * pw).find((c) => c >= raw), top = Math.ceil(maxV / stepV) * stepV;
+    const x = (i) => L + (W - L - R) * (vals.length > 1 ? i / (vals.length - 1) : 0), yv = (v) => T + (H - T - B) * (1 - v / top);
+    const svg = svgEl("svg", { viewBox: "0 0 " + W + " " + H, width: W, height: H, role: "img", "aria-label": "Projected total debt, from " + fmt(vals[0]) + " in " + labels[0] + " to " + fmt(vals[vals.length - 1]) + " in " + labels[labels.length - 1] + ". At " + labels[mark] + ": " + fmt(vals[mark]) + "." });
+    for (let v = 0; v <= top + 1e-6; v += stepV) {
+      svg.append(svgEl("line", { x1: L, x2: W - R, y1: yv(v), y2: yv(v), class: "grid" }));
+      const tx = svgEl("text", { x: L - 8, y: yv(v) + 4, "text-anchor": "end" }); tx.textContent = "$" + d3ish(Math.round(v)); svg.append(tx);
+    }
+    const every = Math.max(1, Math.ceil(vals.length / 6));
+    labels.forEach((lb, i) => { if (i % every) return; const tx = svgEl("text", { x: x(i), y: H - 8, "text-anchor": i === 0 ? "start" : "middle" }); tx.textContent = lb; svg.append(tx); });
+    let line = "", area = "M" + x(0) + " " + yv(0) + " ";
+    vals.forEach((v, i) => { line += (i ? "L" : "M") + x(i) + " " + yv(v) + " "; area += "L" + x(i) + " " + yv(v) + " "; });
+    area += "L" + x(vals.length - 1) + " " + yv(0) + " Z";
+    const a = svgEl("path", { d: area }); a.style.fill = "var(--info-soft)"; a.style.opacity = "0.7"; svg.append(a);
+    const ln = svgEl("path", { d: line, fill: "none", "stroke-width": 2.5, "stroke-linejoin": "round" }); ln.style.stroke = "var(--primary)"; svg.append(ln);
+    const mk = svgEl("line", { x1: x(mark), x2: x(mark), y1: yv(vals[mark]), y2: yv(0), "stroke-width": 1.5, "stroke-dasharray": "4 3" }); mk.style.stroke = "var(--text-muted)"; svg.append(mk);
+    const dot = svgEl("circle", { cx: x(mark), cy: yv(vals[mark]), r: 5.5, "stroke-width": 2.5 }); dot.style.fill = "var(--card)"; dot.style.stroke = "var(--primary)"; svg.append(dot);
+    const anchor = x(mark) > W - 70 ? "end" : x(mark) < L + 40 ? "start" : "middle";
+    const lab = svgEl("text", { x: x(mark) + (anchor === "end" ? 4 : anchor === "start" ? -4 : 0), y: Math.max(12, yv(vals[mark]) - 12), "text-anchor": anchor }); lab.style.fill = "var(--text)"; lab.style.fontWeight = "700"; lab.style.fontSize = "12px"; lab.textContent = fmt(vals[mark]); svg.append(lab);
+    return svg;
+  }
+
+  function renderDebts() {
+    const host = $("debts"); host.replaceChildren();
+    host.append(h("div", { class: "bar-title" }, "Debt balance prediction"));
+    if (!state.loans.length) { host.append(h("div", { class: "list" }, h("div", { class: "empty" }, "Add a loan or credit card in Settings to see how its balance could fall, month by month. ", h("button", { class: "btn small", onclick: () => setTab("settings") }, "Open Settings")))); return; }
+    const now = new Date(), ty = now.getFullYear(), tm = now.getMonth(), debts = state.loans.slice().sort((a, b) => b.balance - a.balance);
+    const sel = (state.y - ty) * 12 + (state.m - tm), k = Math.max(0, sel);
+    const total = (j) => debts.reduce((sum, l) => sum + debtAt(l, j), 0);
+    const monthAt = (j) => { const t = tm + j; return { y: ty + Math.floor(t / 12), m: ((t % 12) + 12) % 12 }; };
+    const short = (p) => MONTHS[p.m].slice(0, 3) + " " + p.y;
+    const unset = debts.some((l) => l.balance > 0 && !(l.payment > 0));
+    const K = unset ? null : Math.max(0, ...debts.map((l) => (l.balance > 0 ? Math.ceil(l.balance / l.payment) : 0)));
+    const sum = (label, value, cls) => h("div", {}, h("div", { class: "l" }, label), h("div", { class: "v " + (cls || "") }, value));
+    const len = Math.min(120, Math.max(12, k + 1)), pts = [], labels = [];
+    for (let j = 0; j < len; j++) { pts.push(total(j)); const p = monthAt(j); labels.push(MONTHS[p.m].slice(0, 3) + (j === 0 || p.m === 0 ? " ’" + String(p.y).slice(2) : "")); }
+    const mark = Math.min(k, len - 1), scale = Math.max(1, ...debts.map((l) => l.balance));
+    const kids = [
+      h("div", { class: "dsum" },
+        sum(sel > 0 ? "Debt at end of " + MONTHS[state.m].slice(0, 3) : "Debt as entered", fmt(total(k))),
+        sum("Paid down by then", sel > 0 ? fmt(total(0) - total(k)) : "–", sel > 0 ? "pos" : ""),
+        sum("Debt-free by", K == null ? "–" : K === 0 ? "Now" : short(monthAt(K)))),
+      h("div", { class: "dchart chart" }, chartDebt(pts, labels, mark))];
+    for (const l of debts) {
+      const bal = debtAt(l, k);
+      kids.push(h("div", { class: "hrow" }, h("span", { class: "hn" }, l.name),
+        h("div", { class: "hbar", role: "img", "aria-label": l.name + ": " + fmt(l.balance) + " today, " + fmt(bal) + " at the end of " + MONTHS[state.m] }, h("i", { class: "plan", style: "width:" + (l.balance / scale * 100) + "%" }), h("i", { class: "done", style: "width:" + (bal / scale * 100) + "%" })),
+        h("span", { class: "hv" }, l.balance > 0 && bal <= 0 ? "Paid off" : fmt(bal))));
+    }
+    kids.push(h("div", { class: "hlegend" }, h("span", {}, h("i", { style: "background:var(--info-soft)" }), "Balance today"), h("span", {}, h("i", { style: "background:var(--primary)" }), sel > 0 ? "Projected at the end of " + MONTHS[state.m] : "Projected")));
+    kids.push(h("p", { class: "sub dnote" }, "This starts from today’s balances. Each month after this one takes off the payment you set, with no interest and no new spending. " + (unset ? "Add a payment amount to every loan and card to see a debt-free month. " : "") + (sel < 0 ? "Earlier months show today’s balances. " : "") + "Use the month arrows at the top to move through time."));
+    host.append(h("div", { class: "list" }, kids));
+  }
+
+/* ---------- settings tab ---------- */
   function renderSettings() {
     const host = $("settingsHost"); host.replaceChildren();
     const cand = state.items.filter((i) => i.type === "bill" || i.type === "income").sort((a, b) => (a.order || 0) - (b.order || 0));
