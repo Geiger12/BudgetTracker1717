@@ -1,0 +1,23 @@
+{
+  "name": "budget-tracker-ios",
+  "private": true,
+  "version": "1.1.0",
+  "scripts": {
+    "sync:app": "node scripts/sync-app.mjs",
+    "plist": "sh scripts/faceid-plist.sh",
+    "test": "node test/native.test.mjs",
+    "ios": "npm run sync:app && npx cap sync ios && npm run plist && npx cap open ios"
+  },
+  "dependencies": {
+    "@aparajita/capacitor-biometric-auth": "^10.0.0",
+    "@capacitor/app": "^8.1.2",
+    "@capacitor/core": "^8.6.2",
+    "@capacitor/haptics": "^8.0.2",
+    "@capacitor/ios": "^8.6.2",
+    "@capacitor/local-notifications": "^8.3.1",
+    "@capacitor/preferences": "^8.0.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.6.2"
+  }
+}
