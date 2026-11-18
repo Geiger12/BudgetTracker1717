@@ -30,6 +30,7 @@
   --shadow-1:0 1px 2px rgba(16,24,40,.06), 0 4px 12px rgba(16,24,40,.05);
   --shadow-2:0 8px 28px rgba(16,24,40,.22);
   --scrim:rgba(15,23,42,.48);
+  --g-rgb:255,255,255; --g-edge:rgba(255,255,255,.85); --g-edge2:rgba(255,255,255,.45); --g-ring:rgba(16,24,40,.09); --g-sheen-a:.34;   /* glass look only */
   /* older names used by the page script and charts, mapped onto the roles above */
   --card:var(--surface); --panel:var(--surface-2); --fg:var(--text); --muted:var(--text-muted); --line:var(--border);
   --navy:var(--primary); --olive:var(--brand); --green:var(--success); --amber:var(--warning); --red:var(--danger); --blue:var(--info); --blue-soft:var(--info-soft);
@@ -44,6 +45,7 @@
     --success:#2cc275; --warning:#f6ad37; --danger:#ff6a60; --info:#2ebfd9; --info-soft:#1f5563;
     --success-soft:#143426; --warning-soft:#3a2d14; --danger-soft:#3b1f1c; --success-text:#6fdca1; --warning-text:#f6c36b; --danger-text:#ff8a80;
     --shadow-1:0 1px 2px rgba(0,0,0,.4); --shadow-2:0 8px 28px rgba(0,0,0,.6); --scrim:rgba(0,0,0,.6); color-scheme: dark;
+    --g-rgb:18,33,42; --g-edge:rgba(255,255,255,.2); --g-edge2:rgba(255,255,255,.1); --g-ring:rgba(0,0,0,.4); --g-sheen-a:.1;
   }
 }
 :root[data-theme="dark"] {
@@ -52,11 +54,12 @@
   --success:#2cc275; --warning:#f6ad37; --danger:#ff6a60; --info:#2ebfd9; --info-soft:#1f5563;
   --success-soft:#143426; --warning-soft:#3a2d14; --danger-soft:#3b1f1c; --success-text:#6fdca1; --warning-text:#f6c36b; --danger-text:#ff8a80;
   --shadow-1:0 1px 2px rgba(0,0,0,.4); --shadow-2:0 8px 28px rgba(0,0,0,.6); --scrim:rgba(0,0,0,.6); color-scheme: dark;
+    --g-rgb:18,33,42; --g-edge:rgba(255,255,255,.2); --g-edge2:rgba(255,255,255,.1); --g-ring:rgba(0,0,0,.4); --g-sheen-a:.1;
 }
 
 /* ===== base ===== */
 * { touch-action:manipulation; }                  /* no double-tap zoom: the home-screen app has no way to zoom back out */
-html { scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 72px); }
+html { scroll-padding-top: calc(env(safe-area-inset-top, 0px) + var(--appbar-h, 61px) + var(--strip-h, 56px) + 16px); }
 * { box-sizing: border-box; }
 [hidden] { display:none !important; }
 body { margin:0; background:var(--bg); color:var(--text); font:var(--fs-md)/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
@@ -94,7 +97,7 @@ input[type=checkbox] { min-height:0; width:20px; height:20px; }
 .appbar .sub { font-size:var(--fs-xs); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
 /* ===== status strip ===== */
-.strip { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:1px; background:rgba(255,255,255,.32); border-radius:var(--r-lg); overflow:hidden; box-shadow:var(--shadow-1); color:var(--on-brand); }
+.strip { position:sticky; top:calc(var(--appbar-h, 61px) + 6px); z-index:25; display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:1px; background:rgba(255,255,255,.32); border-radius:var(--r-lg); overflow:hidden; box-shadow:0 -7px 0 0 var(--bg), var(--shadow-1); color:var(--on-brand); }   /* pinned under the app bar on every tab */
 .strip .cell { background:var(--brand); padding:var(--s3) var(--s4); min-width:0; }
 .strip .lab { font-size:11px; letter-spacing:.09em; text-transform:uppercase; opacity:.9; font-weight:600; }
 .strip .val { font-weight:700; display:flex; align-items:center; gap:var(--s2); min-height:40px; flex-wrap:wrap; }
@@ -422,9 +425,38 @@ section.group, #schedule:not(:empty), #planned:not(:empty) { margin-top:var(--s4
 .lactions { display:flex; gap:var(--s2); flex-wrap:wrap; margin-top:var(--s2); }
 .list .menu-item { border-radius:0; padding:var(--s2) var(--s4); }
 .list .menu-item + .menu-item { border-top:1px solid var(--border); }
+
+/* ===== look: glass (chosen in Settings; flat is the default and is unchanged) =====
+   Every rule below starts with html[data-look="glass"], so flat never sees any of it. */
+html[data-look="glass"] {
+  --g-fill:rgba(var(--g-rgb), .74); --g-fill-strong:rgba(var(--g-rgb), .88);
+  --g-sheen:linear-gradient(180deg, rgba(255,255,255,var(--g-sheen-a)) 0%, rgba(255,255,255,0) 55%);
+  --g-blur:blur(22px) saturate(1.8); --g-toast:rgba(18,32,42,.76);
+}
+html[data-look="glass"] .appbar { background:var(--g-sheen), var(--g-fill); -webkit-backdrop-filter:var(--g-blur); backdrop-filter:var(--g-blur); border-bottom:1px solid var(--g-edge); box-shadow:0 1px 0 var(--g-ring), 0 8px 24px rgba(16,24,40,.1); }
+html[data-look="glass"] .strip { background:var(--g-edge2); border:1px solid var(--g-edge); box-shadow:0 -7px 0 0 var(--bg), inset 0 1px 0 var(--g-edge), 0 0 0 1px var(--g-ring), 0 10px 26px rgba(16,24,40,.14); }
+html[data-look="glass"] .strip .cell { background:var(--g-sheen), var(--brand); }
+@supports (background: color-mix(in srgb, red, blue)) { html[data-look="glass"] .strip .cell { background:var(--g-sheen), color-mix(in srgb, var(--brand) 86%, transparent); } }
+html[data-look="glass"] .tabbar { left:12px; right:12px; bottom:calc(8px + env(safe-area-inset-bottom, 0px)); max-width:560px; margin:0 auto; padding-bottom:0; border:1px solid var(--g-edge); border-radius:30px; background:var(--g-sheen), var(--g-fill); -webkit-backdrop-filter:var(--g-blur); backdrop-filter:var(--g-blur); box-shadow:inset 0 1px 0 var(--g-edge), 0 0 0 1px var(--g-ring), 0 14px 34px rgba(16,24,40,.24); }
+html[data-look="glass"] .tabbar-in { padding:5px var(--s2); }
+html[data-look="glass"] .tab { color:var(--text); }
+html[data-look="glass"] .tab.active { font-weight:750; }
+html[data-look="glass"] .tab.active .pill { box-shadow:inset 0 1px 0 rgba(255,255,255,.65), 0 2px 10px rgba(253,203,47,.45); }
+html[data-look="glass"] .sheet-wrap { background:rgba(15,23,42,.3); }
+html[data-look="glass"] .sheet { background:var(--g-sheen), var(--g-fill-strong); -webkit-backdrop-filter:var(--g-blur); backdrop-filter:var(--g-blur); border:1px solid var(--g-edge); border-bottom:0; border-radius:28px 28px 0 0; box-shadow:inset 0 1px 0 var(--g-edge), var(--shadow-2); }
+@media (min-width:700px) { html[data-look="glass"] .sheet { border-bottom:1px solid var(--g-edge); border-radius:28px; } }
+html[data-look="glass"] .toast { background:var(--g-toast); color:#fff; border:1px solid var(--g-edge); border-radius:18px; -webkit-backdrop-filter:var(--g-blur); backdrop-filter:var(--g-blur); box-shadow:inset 0 1px 0 var(--g-edge), 0 12px 30px rgba(0,0,0,.3); }
+html[data-look="glass"] .scrim { background:rgba(15,23,42,.3); }
+html[data-look="glass"] .drawer { --dr-muted:#b3c5cb; background:linear-gradient(165deg, rgba(36,58,70,.84), rgba(13,26,33,.92)); -webkit-backdrop-filter:blur(26px) saturate(1.7); backdrop-filter:blur(26px) saturate(1.7); border-color:rgba(255,255,255,.22); box-shadow:inset 0 1px 0 rgba(255,255,255,.25), 0 18px 50px rgba(0,0,0,.5); }
+/* solid again for Increase Contrast, so text stays easy to read */
+@media (prefers-contrast: more) {
+  html[data-look="glass"] { --g-fill:var(--surface); --g-fill-strong:var(--surface); --g-sheen:none; --g-blur:none; --g-toast:#12202a; }
+  html[data-look="glass"] .strip .cell { background:var(--brand); }
+  html[data-look="glass"] .drawer { background:linear-gradient(165deg, #1a2b35, #0d1a21); }
+}
 </style>
 
-<script>try{var t=localStorage.getItem("budget-tracker:theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);var k=localStorage.getItem("budget-tracker:colorsCss");if(k){var s=document.createElement("style");s.id="userColors";s.textContent=k;document.head.appendChild(s)}}catch(e){}</script>
+<script>try{var t=localStorage.getItem("budget-tracker:theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);if(localStorage.getItem("budget-tracker:look")==="glass")document.documentElement.setAttribute("data-look","glass");var k=localStorage.getItem("budget-tracker:colorsCss");if(k){var s=document.createElement("style");s.id="userColors";s.textContent=k;document.head.appendChild(s)}}catch(e){}</script>
 </head>
 <body>
 <header class="appbar">
@@ -902,6 +934,10 @@ section.group, #schedule:not(:empty), #planned:not(:empty) { margin-top:var(--s4
   const THEME_KEY = "budget-tracker:theme";
   const getTheme = () => { try { return localStorage.getItem(THEME_KEY) || "auto"; } catch (e) { return "auto"; } };
   function applyTheme() { const t = getTheme(), r = document.documentElement; if (t === "auto") r.removeAttribute("data-theme"); else r.setAttribute("data-theme", t); }
+  const LOOK_KEY = "budget-tracker:look";
+  const getLook = () => { try { return localStorage.getItem(LOOK_KEY) === "glass" ? "glass" : "flat"; } catch (e) { return "flat"; } };
+  function applyLook() { const r = document.documentElement; if (getLook() === "glass") r.setAttribute("data-look", "glass"); else r.removeAttribute("data-look"); }
+  function setLook(v) { try { localStorage.setItem(LOOK_KEY, v); } catch (e) { /* keep going without saving */ } applyLook(); render(); }
   function setTheme(t) { try { localStorage.setItem(THEME_KEY, t); } catch (e) { /* keep going without saving */ } applyTheme(); render(); }
 
   /* ---------- pages on the About site (open in the browser, not inside the app) ---------- */
@@ -970,7 +1006,7 @@ section.group, #schedule:not(:empty), #planned:not(:empty) { margin-top:var(--s4
       item("download", "Save a backup file", () => { setDrawer(false); backup(); }, { id: "menuBackup" }),
       item("upload", "Restore from a file…", () => { setDrawer(false); $("restoreFile").click(); }, { id: "menuRestore" }),
       h("h2", {}, "Appearance"), seg,
-      item("palette", "Colors…", () => openSheet("theme"), { id: "menuColors", right: h("span", { class: "dots", "aria-hidden": "true" }, [col.brand, col.primary, col.accent].map((c) => h("i", { style: "background:" + c })), ) }),
+      item("palette", "Look and colors…", () => openSheet("theme"), { id: "menuColors", right: h("span", { class: "dots", "aria-hidden": "true" }, [col.brand, col.primary, col.accent].map((c) => h("i", { style: "background:" + c })), ) }),
       h("h2", {}, "About"),
       item("info", "About TapBudget", () => openPage(sitePage("about/")), { id: "menuAbout" }),
       item("shield", "Privacy policy", () => openPage(sitePage("about/privacy.html")), { id: "menuPrivacy" }),
@@ -1075,7 +1111,12 @@ section.group, #schedule:not(:empty), #planned:not(:empty) { margin-top:var(--s4
       inp.addEventListener("change", () => render());
       return h("div", { class: "crow" }, h("label", { for: "c-" + key }, label, h("small", {}, hint)), h("div", { style: "display:flex;align-items:center;gap:10px" }, code, inp), nt);
     });
-    host.append(h("div", { class: "panel" }, h("h3", {}, "Colors"),
+    const look = getLook();
+    const lookPanel = h("div", { class: "panel" }, h("h3", {}, "Look"),
+      h("p", { class: "sub" }, "Glass adds see-through, blurred bars, menus and sheets. Flat is solid and bold. It changes straight away."),
+      h("div", { class: "seg", role: "group", "aria-label": "Style", style: "margin:12px 0 0" }, [["flat", "Flat"], ["glass", "Glass"]].map(([v, l]) => h("button", { "aria-pressed": String(look === v), onclick: () => { setLook(v); const b = document.querySelector('#themeHost .seg button[aria-pressed="true"]'); if (b) b.focus({ preventScroll: true }); } }, l))),
+      h("p", { class: "sub", style: "margin-top:8px" }, "With Increase Contrast turned on, Glass stays solid so text is easy to read."));
+    host.append(lookPanel, h("div", { class: "panel" }, h("h3", {}, "Colors"),
       h("p", { class: "sub" }, "Pick a ready-made set, or choose your own. Your choice is saved on this device."),
       h("div", { class: "swatches" }, PRESETS.map((p) => h("button", { class: "swatch", "aria-pressed": String(cur.preset === p.id), "aria-label": p.name + " colors", onclick: () => pickPreset(p.id) }, h("span", { class: "chipset", "aria-hidden": "true" }, [p.brand, p.primary, p.accent].map((c) => h("i", { style: "background:" + c }))), p.name))),
       h("h3", { style: "margin-top:20px" }, "Your own colors"),
@@ -1442,7 +1483,7 @@ section.group, #schedule:not(:empty), #planned:not(:empty) { margin-top:var(--s4
       group("Automatic bills", autoRows.length ? autoRows : [h("div", { class: "empty" }, "Add a bill first, then come back to make it automatic.")], cand.length ? onCount + " of " + cand.length + " automatic" : null),
       group("Loans and cards", loanRows, loanCount || null),
       state.loanEdit === "new" ? null : h("div", { class: "actions" }, h("button", { class: "btn primary", onclick: () => { state.loanEdit = "new"; state.loanPay = null; render(); } }, "Add a loan or card")),
-      group("Appearance and data", [mi("palette", "Colors…", () => openSheet("theme")), mi("folder", "Manage budgets…", () => openSheet("manage")), mi("share", "Share this budget", () => openSheet("share")), mi("download", "Save a backup file", backup)]));
+      group("Appearance and data", [mi("palette", "Look and colors…", () => openSheet("theme")), mi("folder", "Manage budgets…", () => openSheet("manage")), mi("share", "Share this budget", () => openSheet("share")), mi("download", "Save a backup file", backup)]));
   }
 
 /* ---------- tabs, filters and the views behind them ---------- */
@@ -1458,7 +1499,7 @@ section.group, #schedule:not(:empty), #planned:not(:empty) { margin-top:var(--s4
     } catch (e) { /* first run, or storage unavailable */ }
   }
   function saveUI() { try { localStorage.setItem(UI_KEY, JSON.stringify({ tab: state.tab, billFilter: state.billFilter, spendFilter: state.spendFilter, billView: state.billView })); } catch (e) { /* keep going */ } }
-  function setTab(id) { state.tab = id; saveUI(); render(); window.scrollTo(0, 0); }
+  function setTab(id) { state.tab = id; saveUI(); render(); window.scrollTo(0, 0); measureChrome(); }
 
   function renderTabs() {
     const box = $("tabbarIn");
@@ -1698,7 +1739,15 @@ section.group, #schedule:not(:empty), #planned:not(:empty) { margin-top:var(--s4
 
   /* ---------- start ---------- */
   document.addEventListener("gesturestart", (e) => e.preventDefault());      // iOS pinch-zoom, which would otherwise stick
+  function measureChrome() {                                       // keeps the pinned strip exactly under the app bar
+    const ab = document.querySelector(".appbar"), st = $("strip"), r = document.documentElement.style;
+    if (ab && ab.offsetHeight) r.setProperty("--appbar-h", ab.offsetHeight + "px");
+    if (st && st.offsetHeight) r.setProperty("--strip-h", st.offsetHeight + "px");
+  }
+  window.addEventListener("resize", measureChrome);
+  if (window.ResizeObserver) { const ro = new ResizeObserver(measureChrome); ro.observe(document.querySelector(".appbar")); ro.observe($("strip")); }
   applyTheme();
+  applyLook();
   applyColors(getColors());
   load();
   loadUI();
