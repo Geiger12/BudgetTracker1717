@@ -9,32 +9,36 @@ If someone already has budgets saved, the example is added to their list once. *
 
 ## Finding your way around
 
-- **Tab bar (bottom):** four tabs you can reach with your thumb.
-  - **Overview:** one fixed screen with no scrolling. The three gauges (Bills, Money in, Spending) sit at the top so they are never cut off, with a short month summary underneath. On a small screen it trims the summary rather than pushing anything off the bottom.
-  - **Bills:** your income and bills, with filters: **All, Unpaid, Paid, Overdue**. A **List / Schedule** switch flips between the list and the weekly due-date cards. A red badge on the tab counts overdue bills. This tab scrolls.
+- **Header (top):** a greeting, with the open budget's name underneath. Tap the name to switch budgets. The round **+** button adds an item. The round badge with your budget's first letter opens the menu. You can also swipe in from the left edge.
+- **Month bar:** stays pinned at the top while you scroll. The arrows move between months and **Today** jumps back to this month. Next to it is the health light. Green means all clear. Amber means a bill is due within 3 days or everyday spending is over budget. Red means a bill is overdue. On narrow phones the light shows without its word.
+- **Tab bar (bottom):** a floating dark bar with five tabs. The open tab turns white and shows its name. A red badge on Bills counts overdue bills.
+  - **Overview:** one fixed screen with no scrolling. The three gauges (Bills, Money in, Spending) are a stack of cards. Swipe left or right, tap a card peeking out at the side, or tap the chips above the stack. **See bills**, **See money in** and **See spending** open the matching tab. Underneath, the month summary, loans and cards, and the example-budget note sit side by side. Swipe sideways to see them all. On a short screen these get shorter first, so the gauge cards keep their room.
+  - **Bills:** your income and bills, with a search box and filters: **All, Unpaid, Paid, Overdue**. The dark round button in the search box switches to the weekly schedule, one card per week, opening on this week. Swipe through the weeks, and tap **Show list** to go back. This tab scrolls.
   - **Spending:** what you have spent against each everyday budget, with filters: **All, Over budget, Within budget**.
-  - **Insights:** expected income, planned spending and net for the month, where the money goes, and a six-month chart.
-  - The app remembers the tab, view and filters you were using.
-- **Top bar:** the menu button (three lines), the open budget's name, and a yellow **Add** button.
+  - **Insights:** expected income, planned spending and net for the month, where the money goes, a six-month chart and a debt balance prediction.
+  - **Settings:** automatic bills, loans and credit cards, and shortcuts to look and colors, budgets, sharing and backup.
+  - The app remembers the tab, view and filters you were using, and which gauge card was in front.
+- **Bill details:** the round arrow at the end of each bill opens its own screen. It shows the amount and due date in a colored header, the switch, and the paid date and amount once it is paid. The pencil button edits the item. **Coming up** is a row of cards for the other bills still to pay this month. Swipe through them, switch one on, or tap its dark arrow to open it. Go back with the back button, Escape, or a swipe in from the left edge.
 - **Menu (slide-out):**
   - **Budgets:** switch budgets, manage them, or open the example.
   - **Tools:** Add item, Edit items, Share this budget, Import a budget.
   - **Backup:** save a budget to a file, or restore one from a file.
-  - **Appearance:** Auto (follows the phone), Light or Dark, and **Colors…**.
+  - **Appearance:** Auto (follows the phone), Light or Dark, and **Look and colors…**.
+  - **About:** the About page, privacy policy and support.
 - **Sheets:** Add item, Share, Import and Manage budgets open as a panel that slides up from the bottom. Close it with the X, by tapping outside it, or with Escape.
 - **Messages:** short confirmations such as "Link copied" appear above the tab bar and fade away.
-- **Status strip:** budget picker, month, today's date, and a health light. On Overview it is a slim two-row strip. On the other tabs it shrinks to one row. Green means all clear. Amber means a bill is due within 3 days or everyday spending is over budget. Red means a bill is overdue.
 
-## Colors you can change
+## Look and colors
 
-Open **Menu → Colors…** to restyle the whole app. It works in light and dark mode and is saved on that device.
+Open **Menu → Look and colors…** (it is in Settings too). It works in light and dark mode and is saved on that device.
 
+- **The look:** white cards, charcoal buttons and soft shadows. **Flat** keeps the month bar, tab bar, menu and sheets solid. **Glass** makes them see-through and blurred. With Increase Contrast turned on, Glass stays solid.
 - **Ready-made sets:** Cyan & Yellow (the default), Ocean, Forest, Sunset, Berry and Graphite.
 - **Your own colors:** three pickers.
-  - **Header color:** the status strip and light touches.
-  - **Button and bar color:** buttons, section bars and progress bars.
-  - **Highlight color:** the Add button, the open tab and the chosen filter.
-- **Readable by default:** the text color on each of your colors is chosen automatically (white or dark). If a color can't hold readable text, a note says so. In dark mode, very dark colors are lightened automatically so they still show.
+  - **Card color:** the Bills card and the bill headers.
+  - **Bar and chart color:** the Spending card, progress bars and charts.
+  - **Highlight color:** the Money in card, your budget badge and this week in the schedule.
+- **Readable by default:** the gauge cards and bill headers sit on a dark base, so their white text stays readable whatever you pick. Elsewhere the text color on each of your colors is chosen automatically (white or dark). If a color can't hold readable text, a note says so. In dark mode, very dark colors are lightened automatically so they still show.
 - **Reset** returns to Cyan & Yellow.
 
 Green, orange and red keep their meaning (paid, due soon, overdue) whichever colors you pick.
@@ -78,9 +82,9 @@ The data is inside the link and is never sent to GitHub. Anyone who has the link
 
 ## Several budgets
 
-Use the picker in the status strip, or the menu. **Menu → Manage budgets** creates, renames and deletes budgets. Each is separate.
+Tap the budget name under the greeting, or use the menu. **Menu → Manage budgets** creates, renames and deletes budgets. Each is separate.
 
 ## Notes
 
 - Data lives in the browser on that device and is not encrypted. A different phone or browser starts with the example until you Import.
-- Updating the app: re-upload `index.html`. If a change doesn't appear, close and reopen the app.
+- Updating the app: re-upload the files that changed. Each time `index.html` changes, also change the cache name at the top of `sw.js` (for example `tapbudget-v16` to `tapbudget-v17`) so phones drop the old copy. If a change doesn't appear, close and reopen the app.
