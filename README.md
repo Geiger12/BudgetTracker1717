@@ -9,7 +9,7 @@ If someone already has budgets saved, the example is added to their list once. *
 
 ## Finding your way around
 
-- **Header (top):** a greeting, with the open budget's name underneath. Tap the name to switch budgets. The round **+** button adds an item. The round badge with your budget's first letter opens the menu. You can also swipe in from the left edge.
+- **Header (top):** the app icon on the left opens the menu, which slides out from the left edge. You can also swipe in from the left edge of the screen. Next to the icon is a greeting, with the open budget's name underneath. Tap the name to switch budgets. The round **+** button on the right adds an item.
 - **Month bar:** stays pinned at the top while you scroll. The arrows move between months and **Today** jumps back to this month. Next to it is the health light. Green means all clear. Amber means a bill is due within 3 days or everyday spending is over budget. Red means a bill is overdue. On narrow phones the light shows without its word.
 - **Tab bar (bottom):** a floating dark bar with five tabs. The open tab turns white and shows its name. A red badge on Bills counts overdue bills.
   - **Overview:** one fixed screen with no scrolling. The three gauges (Bills, Money in, Spending) are a stack of cards. Swipe left or right, tap a card peeking out at the side, or tap the chips above the stack. **See bills**, **See money in** and **See spending** open the matching tab. Underneath, the month summary, loans and cards, and the example-budget note sit side by side. Swipe sideways to see them all. On a short screen these get shorter first, so the gauge cards keep their room.
@@ -37,7 +37,7 @@ Open **Menu → Look and colors…** (it is in Settings too). It works in light 
 - **Your own colors:** three pickers.
   - **Card color:** the Bills card and the bill headers.
   - **Bar and chart color:** the Spending card, progress bars and charts.
-  - **Highlight color:** the Money in card, your budget badge and this week in the schedule.
+  - **Highlight color:** the Money in card and this week in the schedule.
 - **Readable by default:** the gauge cards and bill headers sit on a dark base, so their white text stays readable whatever you pick. Elsewhere the text color on each of your colors is chosen automatically (white or dark). If a color can't hold readable text, a note says so. In dark mode, very dark colors are lightened automatically so they still show.
 - **Reset** returns to Cyan & Yellow.
 
@@ -87,4 +87,4 @@ Tap the budget name under the greeting, or use the menu. **Menu → Manage budge
 ## Notes
 
 - Data lives in the browser on that device and is not encrypted. A different phone or browser starts with the example until you Import.
-- Updating the app: re-upload the files that changed. Each time `index.html` changes, also change the cache name at the top of `sw.js` (for example `tapbudget-v16` to `tapbudget-v17`) so phones drop the old copy. If a change doesn't appear, close and reopen the app.
+- Updating the app: re-upload the files that changed. Each time `index.html` changes, also change the cache name at the top of `sw.js` (for example `tapbudget-v17` to `tapbudget-v18`) so phones drop the old copy. If a change doesn't appear, close and reopen the app.

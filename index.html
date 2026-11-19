@@ -16,7 +16,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <style>
 /* ===== design tokens: white surfaces, charcoal controls, soft shadows.
-   Your three colors tint the gauge cards, bill headers, bars and the budget badge. ===== */
+   Your three colors tint the gauge cards, bill headers and bars. ===== */
 :root {
   --bg:#f4f4f5; --surface:#ffffff; --surface-2:#efeff1; --text:#1d1e21; --text-muted:#64666b; --border:#e7e7ea; --track:#e4e4e7;
   --ink:#1d1e21; --solid:#232428; --on-solid:#ffffff; --nav:#232428; --night:#18191c;   /* night = base of the tinted cards; white text always sits on it */
@@ -33,6 +33,7 @@
   --shadow-nav:0 16px 36px rgba(22,22,26,.28);
   --ring:var(--text);
   --scrim:rgba(17,18,20,.4);
+  --app-icon:url("data:image/png;base64,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");   /* the app icon, 144px, on the menu button and in the menu */
   --g-rgb:255,255,255; --g-edge:rgba(255,255,255,.85); --g-edge2:rgba(255,255,255,.45); --g-ring:rgba(16,24,40,.08); --g-sheen-a:.34;   /* glass look only */
   /* older names used by the page script and charts, mapped onto the roles above */
   --card:var(--surface); --panel:var(--surface-2); --fg:var(--text); --muted:var(--text-muted); --line:var(--border);
@@ -107,16 +108,17 @@ input.day { width:64px; }
 input[type=checkbox] { min-height:0; width:20px; height:20px; }
 
 /* ===== greeting header ===== */
-.head { display:flex; align-items:center; gap:var(--s3); padding:var(--s3) var(--s1) var(--s2); }
+.head { display:flex; align-items:center; gap:14px; padding:var(--s3) var(--s1) var(--s2); }
+.head h1 { font-size:clamp(22px, 7vw, var(--fs-xl)); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .head .titles { flex:1; min-width:0; }
 .budgetpick { position:relative; display:inline-flex; max-width:100%; color:var(--text-muted); margin-top:2px; }
 .budgetpick::after { content:""; position:absolute; right:7px; top:50%; width:7px; height:7px; border-right:2px solid currentColor; border-bottom:2px solid currentColor; transform:translateY(-75%) rotate(45deg); pointer-events:none; }
 .budgetpick select { -webkit-appearance:none; appearance:none; border:0; background:transparent; color:var(--text-muted); font-size:16px; font-weight:500; min-height:32px; padding:2px 26px 2px 0; max-width:100%; text-overflow:ellipsis; border-radius:8px; cursor:pointer; }
 .budgetpick select:focus { outline:none; }
 .budgetpick select:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
-.avatar { position:relative; width:48px; height:48px; border-radius:50%; border:0; padding:0; flex:none; background:var(--accent); color:var(--accent-fg); font-weight:800; font-size:19px; box-shadow:0 0 0 3px var(--surface), var(--shadow-1); }
-.avatar .mini { position:absolute; right:-4px; bottom:-4px; width:22px; height:22px; border-radius:50%; background:var(--solid); color:var(--on-solid); display:grid; place-items:center; box-shadow:0 0 0 2px var(--bg); }
-.avatar .mini svg { width:12px; height:12px; fill:none; stroke:currentColor; stroke-width:2.8; stroke-linecap:round; }
+.appicon { position:relative; flex:none; width:48px; height:48px; border:0; padding:0; border-radius:14px; background:var(--app-icon) center / cover no-repeat, #2ebfd9; box-shadow:var(--shadow-1); }
+.appicon .mini { position:absolute; right:-5px; bottom:-5px; width:22px; height:22px; border-radius:50%; background:var(--solid); color:var(--on-solid); display:grid; place-items:center; box-shadow:0 0 0 2px var(--bg); }
+.appicon .mini svg { width:12px; height:12px; fill:none; stroke:currentColor; stroke-width:2.8; stroke-linecap:round; }
 
 /* ===== month bar (pinned at the top while you scroll) ===== */
 .strip { position:sticky; top:env(safe-area-inset-top, 0px); z-index:30; display:flex; align-items:center; gap:var(--s2); margin:0 calc(var(--s4) * -1); padding:var(--s2) var(--s4); background:var(--bg); }
@@ -136,8 +138,8 @@ input[type=checkbox] { min-height:0; width:20px; height:20px; }
 @media (max-width:369px) { .healthpill { padding:0 18px; } .healthpill .hl { display:none; } }
 /* short phones (iPhone SE and similar): a tighter header so the Overview still fits on one screen */
 @media (max-height:700px) {
-  .head { padding:var(--s1) var(--s1) 2px; } .head h1 { font-size:24px; } .budgetpick select { min-height:28px; font-size:15px; }
-  .roundbtn, .avatar { width:42px; height:42px; } .strip { padding-top:6px; padding-bottom:6px; } .monthpill, .healthpill { min-height:48px; } .monthpill { padding:3px; }
+  .head { padding:var(--s1) var(--s1) 2px; } .head h1 { font-size:clamp(22px, 6.4vw, 24px); } .budgetpick select { min-height:28px; font-size:15px; }
+  .roundbtn, .appicon { width:42px; height:42px; } .strip { padding-top:6px; padding-bottom:6px; } .monthpill, .healthpill { min-height:48px; } .monthpill { padding:3px; }
   #view-overview .chips { margin-top:var(--s1); } .chipbtn { min-height:38px; } .deck { min-height:224px; }
 }
 
@@ -216,7 +218,7 @@ section.group, #schedule:not(:empty), #planned:not(:empty), #where:not(:empty), 
 .drawer [hidden] { display:none !important; }
 .drawer-head { display:flex; align-items:center; gap:var(--s3); padding:var(--s4) var(--s3) var(--s2) var(--s4); }
 .drawer-head .titles { flex:1; min-width:0; }
-.drawer-logo { flex:none; width:42px; height:42px; border-radius:50%; display:grid; place-items:center; background:var(--accent); color:var(--accent-fg); font-weight:800; font-size:19px; }
+.drawer-logo { flex:none; width:42px; height:42px; border-radius:12px; background:var(--app-icon) center / cover no-repeat, #2ebfd9; }
 .drawer-head .iconbtn { color:var(--dr-muted); }
 .drawer-head .iconbtn:hover { background:rgba(255,255,255,.1); color:#fff; }
 .drawer-title { font-weight:780; font-size:var(--fs-lg); color:#fff; letter-spacing:-0.01em; }
@@ -541,9 +543,9 @@ html[data-look="glass"] .drawer { background:linear-gradient(165deg, rgba(48,49,
 <body>
 <div class="wrap">
   <header class="head" id="head">
+    <button class="appicon" id="menuBtn" aria-label="Open menu" title="Menu" aria-expanded="false" aria-controls="drawer"></button>
     <div class="titles"><h1 id="greet">Hello</h1><div class="budgetpick" id="budgetCell"></div></div>
     <button class="roundbtn dark" id="appAdd" aria-label="Add item" title="Add item"></button>
-    <button class="avatar" id="menuBtn" aria-label="Open menu" title="Menu" aria-expanded="false" aria-controls="drawer"></button>
   </header>
   <div class="strip" id="strip"></div>
   <div id="editBar"></div>
@@ -1110,7 +1112,7 @@ html[data-look="glass"] .drawer { background:linear-gradient(165deg, rgba(48,49,
       flush(); none.hidden = !(t && total === 0);
     });
     d.append(
-      h("div", { class: "drawer-head" }, h("span", { class: "drawer-logo", "aria-hidden": "true" }, "T"),
+      h("div", { class: "drawer-head" }, h("span", { class: "drawer-logo", "aria-hidden": "true" }),
         h("div", { class: "titles" }, h("div", { class: "drawer-title" }, "TapBudget"), h("div", { class: "drawer-sub" }, curName())),
         h("button", { class: "iconbtn", "aria-label": "Close menu", onclick: () => setDrawer(false) }, ico("close"))),
       h("button", { class: "drawer-toggle", "aria-label": railOn ? "Expand menu" : "Collapse menu to icons", "aria-expanded": String(!railOn), onclick: () => setRail(!railOn) }, ico(railOn ? "chevR" : "chevL")),
@@ -1120,8 +1122,7 @@ html[data-look="glass"] .drawer { background:linear-gradient(165deg, rgba(48,49,
 
   const greeting = () => { const hr = new Date().getHours(); return hr >= 5 && hr < 12 ? "Good morning" : hr >= 12 && hr < 18 ? "Good afternoon" : "Good evening"; };
   function renderChrome() {
-    const ini = (Array.from(curName().trim())[0] || "T").toUpperCase();
-    $("menuBtn").replaceChildren(h("span", { "aria-hidden": "true" }, ini), h("span", { class: "mini", "aria-hidden": "true" }, ico("menu")));
+    if (!$("menuBtn").firstChild) $("menuBtn").append(h("span", { class: "mini", "aria-hidden": "true" }, ico("menu")));
     $("sheetClose").replaceChildren(ico("close"));
     $("appAdd").replaceChildren(ico("plus"));
     $("greet").textContent = greeting();
@@ -1183,7 +1184,7 @@ html[data-look="glass"] .drawer { background:linear-gradient(165deg, rgba(48,49,
     const host = $("themeHost"); host.replaceChildren();
     if (!state.themeOpen) return;
     const cur = getColors();
-    const roles = [["brand", "Card color", "The Bills card and the bill headers"], ["primary", "Bar and chart color", "The Spending card, progress bars and charts"], ["accent", "Highlight color", "The Money in card, your budget badge and this week in the schedule"]];
+    const roles = [["brand", "Card color", "The Bills card and the bill headers"], ["primary", "Bar and chart color", "The Spending card, progress bars and charts"], ["accent", "Highlight color", "The Money in card and this week in the schedule"]];
     const note = (hex) => { const best = Math.max(contrastOf(hex, "#ffffff"), contrastOf(hex, INK)); return best >= 4.5 ? ["Text on this color is easy to read.", false] : ["Text on this color is hard to read. Try a darker or lighter shade.", true]; };
     const rows = roles.map(([key, label, hint]) => {
       const [txt, warn] = note(cur[key]);
@@ -1931,7 +1932,7 @@ html[data-look="glass"] .drawer { background:linear-gradient(165deg, rgba(48,49,
   document.addEventListener("keydown", (e) => { if (e.key !== "Escape") return; if (state.drawer) setDrawer(false); else if (!$("sheetWrap").hidden) closeSheet(); else if (state.bill) closeBill(); });
   /* swipe the menu in from the left edge (it follows your finger), and swipe it back to close.
      On a bill's details the same edge swipe goes back, the way it does in iPhone apps. */
-  const EDGE = 24, drawerEl = $("drawer"), scrimEl = $("scrim");
+  const EDGE = 28, drawerEl = $("drawer"), scrimEl = $("scrim");
   let drag = null;
   const closedX = () => -(drawerEl.offsetWidth + 32);
   function dragTo(x) {
