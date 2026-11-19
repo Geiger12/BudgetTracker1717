@@ -16,23 +16,28 @@ If someone already has budgets saved, the example is added to their list once. *
   - **Bills:** your income and bills, with a search box and filters: **All, Unpaid, Paid, Overdue**. The dark round button in the search box switches to the weekly schedule, one card per week, opening on this week. Swipe through the weeks, and tap **Show list** to go back. This tab scrolls.
   - **Spending:** what you have spent against each everyday budget, with filters: **All, Over budget, Within budget**.
   - **Insights:** expected income, planned spending and net for the month, where the money goes, a six-month chart and a debt balance prediction.
-  - **Settings:** automatic bills, loans and credit cards, and shortcuts to look and colors, budgets, sharing and backup.
+  - **Settings:** automatic bills, loans and credit cards, and shortcuts to wallpaper and colors, budgets, sharing and backup.
   - The app remembers the tab, view and filters you were using, and which gauge card was in front.
 - **Bill details:** the round arrow at the end of each bill opens its own screen. It shows the amount and due date in a colored header, the switch, and the paid date and amount once it is paid. The pencil button edits the item. **Coming up** is a row of cards for the other bills still to pay this month. Swipe through them, switch one on, or tap its dark arrow to open it. Go back with the back button, Escape, or a swipe in from the left edge.
 - **Menu (slide-out):**
   - **Budgets:** switch budgets, manage them, or open the example.
   - **Tools:** Add item, Edit items, Share this budget, Import a budget.
   - **Backup:** save a budget to a file, or restore one from a file.
-  - **Appearance:** Auto (follows the phone), Light or Dark, and **Look and colors…**.
+  - **Appearance:** Auto (follows the phone), Light or Dark, and **Wallpaper and colors…**.
   - **About:** the About page, privacy policy and support.
 - **Sheets:** Add item, Share, Import and Manage budgets open as a panel that slides up from the bottom. Close it with the X, by tapping outside it, or with Escape.
 - **Messages:** short confirmations such as "Link copied" appear above the tab bar and fade away.
 
-## Look and colors
+## Wallpaper and colors
 
-Open **Menu → Look and colors…** (it is in Settings too). It works in light and dark mode and is saved on that device.
+Open **Menu → Wallpaper and colors…** (it is in Settings too). Everything here works in light and dark mode and is saved on that device.
 
-- **The look:** white cards, charcoal buttons and soft shadows. **Flat** keeps the month bar, tab bar, menu and sheets solid. **Glass** makes them see-through and blurred. With Increase Contrast turned on, Glass stays solid.
+- **Wallpaper:** tap **Choose a picture** to put one of your own photos behind the app. **Change picture** swaps it and **Remove** takes it away.
+  - **Dim** fades the picture toward the page color (light or dark). **Blur** softens it.
+  - Big photos are shrunk to 2,200 pixels on the longest side before they are saved, so they load quickly.
+  - Text never sits on the picture itself. Headings, the greeting and notes get a near-solid plate behind them, so they stay readable on any photo.
+  - The picture stays on that device. It is not in share links or backup files, so a restored or shared budget keeps its own look.
+- **The look:** white cards, charcoal buttons and soft shadows. **Flat** keeps the month bar, tab bar, menu and sheets solid. **Glass** makes them see-through and blurred. With a wallpaper, Glass is a little more solid so text stays readable. With Increase Contrast turned on, Glass stays solid.
 - **Ready-made sets:** Cyan & Yellow (the default), Ocean, Forest, Sunset, Berry and Graphite.
 - **Your own colors:** three pickers.
   - **Card color:** the Bills card and the bill headers.
@@ -86,5 +91,5 @@ Tap the budget name under the greeting, or use the menu. **Menu → Manage budge
 
 ## Notes
 
-- Data lives in the browser on that device and is not encrypted. A different phone or browser starts with the example until you Import.
-- Updating the app: re-upload the files that changed. Each time `index.html` changes, also change the cache name at the top of `sw.js` (for example `tapbudget-v17` to `tapbudget-v18`) so phones drop the old copy. If a change doesn't appear, close and reopen the app.
+- Data lives in the browser on that device and is not encrypted. The budgets and settings are in localStorage. The wallpaper picture is in IndexedDB, so it never takes room from your budgets. A different phone or browser starts with the example until you Import.
+- Updating the app: re-upload the files that changed. Each time `index.html` changes, also change the cache name at the top of `sw.js` (for example `tapbudget-v18` to `tapbudget-v19`) so phones drop the old copy. If a change doesn't appear, close and reopen the app.
