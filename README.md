@@ -32,11 +32,14 @@ If someone already has budgets saved, the example is added to their list once. *
 
 Open **Menu → Wallpaper and colors…** (it is in Settings too). Everything here works in light and dark mode and is saved on that device.
 
+**Each budget keeps its own wallpaper, colors and look (Flat or Glass).** The sheet says which budget you are changing. Switch budgets and the app switches to that budget's look. A new budget starts with the look that was showing when you made it. Light, Dark or Auto is one setting for the whole app.
+
 - **Wallpaper:** tap **Choose a picture** to put one of your own photos behind the app. **Change picture** swaps it and **Remove** takes it away.
   - **Dim** fades the picture toward the page color (light or dark). **Blur** softens it.
   - Big photos are shrunk to 2,200 pixels on the longest side before they are saved, so they load quickly.
   - Text never sits on the picture itself. Headings, the greeting and notes get a near-solid plate behind them, so they stay readable on any photo.
-  - The picture stays on that device. It is not in share links or backup files, so a restored or shared budget keeps its own look.
+  - The picture stays on that device. It is not in share links or backup files. Neither are a budget's colors or look, so an imported budget starts with the look that is showing.
+  - Two budgets can use the same picture without storing it twice. A picture no budget uses any more is deleted, including when its budget is deleted.
 - **The look:** white cards, charcoal buttons and soft shadows. **Flat** keeps the month bar, tab bar, menu and sheets solid. **Glass** makes them see-through and blurred. With a wallpaper, Glass is a little more solid so text stays readable. With Increase Contrast turned on, Glass stays solid.
 - **Ready-made sets:** Cyan & Yellow (the default), Ocean, Forest, Sunset, Berry and Graphite.
 - **Your own colors:** three pickers.
@@ -91,5 +94,5 @@ Tap the budget name under the greeting, or use the menu. **Menu → Manage budge
 
 ## Notes
 
-- Data lives in the browser on that device and is not encrypted. The budgets and settings are in localStorage. The wallpaper picture is in IndexedDB, so it never takes room from your budgets. A different phone or browser starts with the example until you Import.
-- Updating the app: re-upload the files that changed. Each time `index.html` changes, also change the cache name at the top of `sw.js` (for example `tapbudget-v18` to `tapbudget-v19`) so phones drop the old copy. If a change doesn't appear, close and reopen the app.
+- Data lives in the browser on that device and is not encrypted. The budgets and settings are in localStorage. Each budget's look is in localStorage too. The wallpaper pictures are in IndexedDB, so they never take room from your budgets. A different phone or browser starts with the example until you Import.
+- Updating the app: re-upload the files that changed. Each time `index.html` changes, also change the cache name at the top of `sw.js` (for example `tapbudget-v19` to `tapbudget-v20`) so phones drop the old copy. If a change doesn't appear, close and reopen the app.

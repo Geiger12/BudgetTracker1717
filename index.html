@@ -536,6 +536,7 @@ html.has-wall[data-look="glass"] { --g-fill:rgba(var(--g-rgb), .92); --g-fill-st
 .wthumb.on::after { content:""; position:absolute; inset:0; background:var(--bg); opacity:var(--wall-dim, .3); }
 .wbtns { display:flex; flex-direction:column; align-items:flex-start; gap:var(--s2); min-width:0; }
 .wmsg { margin:var(--s2) 0 0; }
+.banner.lookfor { margin:var(--s1) 48px var(--s4) 0; background:var(--surface-2); color:var(--text); }
 .wmsg:empty { display:none; }
 .wmsg.bad { color:var(--danger-text); font-weight:600; }
 .wrow { display:grid; grid-template-columns:minmax(0, 1fr) auto; gap:2px var(--s3); align-items:center; margin-top:var(--s3); padding-top:var(--s3); border-top:1px solid var(--border); }
@@ -1058,7 +1059,8 @@ html[data-look="glass"] .drawer { background:linear-gradient(165deg, rgba(48,49,
   const LOOK_KEY = "budget-tracker:look";
   const getLook = () => { try { return localStorage.getItem(LOOK_KEY) === "glass" ? "glass" : "flat"; } catch (e) { return "flat"; } };
   function applyLook() { const r = document.documentElement; if (getLook() === "glass") r.setAttribute("data-look", "glass"); else r.removeAttribute("data-look"); }
-  function setLook(v) { try { localStorage.setItem(LOOK_KEY, v); } catch (e) { /* keep going without saving */ } applyLook(); render(); }
+  function writeLook(v) { try { localStorage.setItem(LOOK_KEY, v); } catch (e) { /* keep going without saving */ } applyLook(); }
+  function setLook(v) { writeLook(v); rememberLook(); render(); }
   function setTheme(t) { try { localStorage.setItem(THEME_KEY, t); } catch (e) { /* keep going without saving */ } applyTheme(); render(); }
 
   /* ---------- pages on the About site (open in the browser, not inside the app) ---------- */
@@ -1212,16 +1214,16 @@ html[data-look="glass"] .drawer { background:linear-gradient(165deg, rgba(48,49,
     try { localStorage.setItem(COLORS_CSS_KEY, css); } catch (e) { /* ignore */ }
   }
   function saveColors(c) { try { localStorage.setItem(COLORS_KEY, JSON.stringify(c)); } catch (e) { /* keep going */ } applyColors(c); }
-  function pickPreset(id) { const p = PRESETS.find((x) => x.id === id); if (p) { saveColors({ preset: p.id, brand: p.brand, primary: p.primary, accent: p.accent }); render(); } }
+  function pickPreset(id) { const p = PRESETS.find((x) => x.id === id); if (p) { saveColors({ preset: p.id, brand: p.brand, primary: p.primary, accent: p.accent }); rememberLook(); render(); } }
 
   /* ---------- wallpaper: a picture of your own behind the app. The picture is kept in this browser's
      IndexedDB (so it never crowds out your budgets in localStorage); only the on/dim/blur settings live in localStorage.
      It is never added to share links or backup files. ---------- */
-  const WALL_KEY = "budget-tracker:wall", WALL_IMG = "wallpaper", WALL_MAX = 2200;   // longest side kept, in pixels
+  const WALL_KEY = "budget-tracker:wall", WALL_LEGACY = "wallpaper", WALL_MAX = 2200;   // longest side kept, in pixels
   const numIn = (v, lo, hi, d) => (typeof v === "number" && isFinite(v) ? Math.min(hi, Math.max(lo, Math.round(v))) : d);
   function getWall() {
-    try { const w = JSON.parse(localStorage.getItem(WALL_KEY) || "null"); if (w && typeof w === "object") return { on: !!w.on, dim: numIn(w.dim, 0, 80, 30), blur: numIn(w.blur, 0, 100, 0) }; } catch (e) { /* use the default */ }
-    return { on: false, dim: 30, blur: 0 };
+    try { const w = JSON.parse(localStorage.getItem(WALL_KEY) || "null"); if (w && typeof w === "object") return { on: !!w.on, dim: numIn(w.dim, 0, 80, 30), blur: numIn(w.blur, 0, 100, 0), id: typeof w.id === "string" && w.id ? w.id.slice(0, 40) : WALL_LEGACY }; } catch (e) { /* use the default */ }
+    return { on: false, dim: 30, blur: 0, id: null };
   }
   function applyWallVars(w) {
     const r = document.documentElement; r.classList.toggle("has-wall", !!w.on);
@@ -1241,16 +1243,20 @@ html[data-look="glass"] .drawer { background:linear-gradient(165deg, rgba(48,49,
       };
     });
   }
-  let wallUrl = null, wallMsg = "", wallBad = false;
+  let wallUrl = null, wallMsg = "", wallBad = false, wallSaving = null;   // wallSaving: a picture being saved right now, so tidying never deletes it
   function showWall(blob) {
     const el = $("wall"); if (wallUrl) URL.revokeObjectURL(wallUrl);
     wallUrl = blob ? URL.createObjectURL(blob) : null;
     el.style.backgroundImage = wallUrl ? 'url("' + wallUrl + '")' : ""; el.classList.toggle("ready", !!wallUrl);
   }
   async function loadWall() {
-    if (!getWall().on) return;
-    try { const blob = await idbRun("readonly", (st) => st.get(WALL_IMG)); if (blob) { showWall(blob); if (state.themeOpen) render(); } else saveWall({ ...getWall(), on: false }); }
-    catch (e) { /* the page color shows instead */ }
+    const w = getWall(), forId = state.activeId;
+    if (!w.on || !w.id) { showWall(null); return; }
+    try {
+      const blob = await idbRun("readonly", (st) => st.get(w.id));
+      const now = getWall(); if (state.activeId !== forId || !now.on || now.id !== w.id) return;   // switched budgets while it loaded
+      if (blob) { showWall(blob); if (state.themeOpen) render(); } else { saveWall({ ...now, on: false, id: null }); rememberLook(); showWall(null); }
+    } catch (e) { /* the page color shows instead */ }
   }
   const fileToImage = (file) => new Promise((res, rej) => { const u = URL.createObjectURL(file), im = new Image(); im.onload = () => { URL.revokeObjectURL(u); res(im); }; im.onerror = () => { URL.revokeObjectURL(u); rej(new Error("decode")); }; im.src = u; });
   async function pickWall(file) {
@@ -1263,16 +1269,18 @@ html[data-look="glass"] .drawer { background:linear-gradient(165deg, rgba(48,49,
       const cv = document.createElement("canvas"); cv.width = Math.max(1, Math.round(im.naturalWidth * k)); cv.height = Math.max(1, Math.round(im.naturalHeight * k));
       const g = cv.getContext("2d"); g.fillStyle = "#ffffff"; g.fillRect(0, 0, cv.width, cv.height); g.drawImage(im, 0, 0, cv.width, cv.height);
       const blob = await new Promise((res, rej) => cv.toBlob((b) => (b ? res(b) : rej(new Error("encode"))), "image/jpeg", 0.84));
-      step = "save"; await idbRun("readwrite", (st) => st.put(blob, WALL_IMG));
-      showWall(blob); saveWall({ ...getWall(), on: true }); wallMsg = ""; state.note = "Wallpaper set. It stays on this device."; render();
+      const id = "wall-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+      step = "save"; wallSaving = id; await idbRun("readwrite", (st) => st.put(blob, id));
+      showWall(blob); saveWall({ ...getWall(), on: true, id }); rememberLook(); wallSaving = null; tidyWalls();
+      wallMsg = ""; state.note = "Wallpaper set for “" + curName() + "”. It stays on this device."; render();
     } catch (e) {
-      wallBad = true; wallMsg = step === "save" ? "This browser couldn’t save the picture. Try a smaller one, or check that there is free space." : "That picture couldn’t be opened. Try a JPEG or PNG.";
+      wallSaving = null; wallBad = true; wallMsg = step === "save" ? "This browser couldn’t save the picture. Try a smaller one, or check that there is free space." : "That picture couldn’t be opened. Try a JPEG or PNG.";
       render();
     }
   }
   async function removeWall() {
-    try { await idbRun("readwrite", (st) => st.delete(WALL_IMG)); } catch (e) { /* turned off below either way */ }
-    showWall(null); saveWall({ ...getWall(), on: false }); wallMsg = ""; state.note = "Wallpaper removed."; render();
+    showWall(null); saveWall({ ...getWall(), on: false, id: null }); rememberLook(); tidyWalls();
+    wallMsg = ""; state.note = "Wallpaper removed from “" + curName() + "”."; render();
     const b = $("wallChoose"); if (b) b.focus({ preventScroll: true });
   }
   function wallPanel() {
@@ -1283,11 +1291,11 @@ html[data-look="glass"] .drawer { background:linear-gradient(165deg, rgba(48,49,
       const out = h("output", { for: "w-" + key }, w[key] + "%");
       const inp = h("input", { type: "range", id: "w-" + key, min: "0", max: String(max), step: "1", value: String(w[key]) });
       inp.addEventListener("input", () => { applyWallVars({ ...getWall(), [key]: +inp.value }); out.textContent = inp.value + "%"; });
-      inp.addEventListener("change", () => saveWall({ ...getWall(), [key]: +inp.value }));
+      inp.addEventListener("change", () => { saveWall({ ...getWall(), [key]: +inp.value }); rememberLook(); });
       return h("div", { class: "wrow" }, h("label", { for: "w-" + key }, label, h("small", {}, hint)), out, inp);
     };
     return h("div", { class: "panel" }, h("h3", {}, "Wallpaper"),
-      h("p", { class: "sub" }, "Put a picture of your own behind the app. It stays on this device. It isn’t included in shared links or backup files."),
+      h("p", { class: "sub" }, "Put a picture of your own behind this budget. It stays on this device. It isn’t included in shared links or backup files."),
       h("div", { class: "wpick" }, thumb, h("div", { class: "wbtns" },
         h("button", { class: "btn primary", id: "wallChoose", onclick: () => { wallMsg = ""; $("wallFile").click(); } }, ico("image"), w.on ? "Change picture" : "Choose a picture"),
         w.on ? h("button", { class: "btn danger", id: "wallRemove", onclick: removeWall }, "Remove") : null)),
@@ -1295,6 +1303,41 @@ html[data-look="glass"] .drawer { background:linear-gradient(165deg, rgba(48,49,
       w.on ? slider("dim", "Dim", "Fades the picture toward the page color", 80) : null,
       w.on ? slider("blur", "Blur", "Softens the picture", 100) : null,
       w.on ? h("p", { class: "sub", style: "margin-top:12px" }, "Text always sits on a card or a plate, so it stays readable on any picture.") : null);
+  }
+
+  /* ---------- each budget keeps its own look: wallpaper, colors, and Flat or Glass. Light, Dark or Auto stays the same for the whole app.
+     The settings above always hold the open budget's look (the start-up script reads them before the first frame);
+     this map remembers every budget's look, so switching budgets switches it back. It lives on this device only. ---------- */
+  const LOOKS_KEY = "budget-tracker:looks";
+  const currentLook = () => ({ colors: getColors(), look: getLook(), wall: getWall() });
+  function getLooks() { try { const m = JSON.parse(localStorage.getItem(LOOKS_KEY) || "{}"); return m && typeof m === "object" && !Array.isArray(m) ? m : {}; } catch (e) { return {}; } }
+  function putLooks(m) { try { localStorage.setItem(LOOKS_KEY, JSON.stringify(m)); } catch (e) { /* this session still follows it */ } }
+  function rememberLook() { if (!state.activeId) return; const m = getLooks(); m[state.activeId] = currentLook(); putLooks(m); }
+  async function tidyWalls() {                                     // delete pictures no budget uses any more
+    const used = new Set(Object.values(getLooks()).map((e) => e && e.wall && e.wall.on && e.wall.id).filter(Boolean)); if (wallSaving) used.add(wallSaving);
+    try {
+      const keys = await idbRun("readonly", (st) => st.getAllKeys());
+      const gone = (keys || []).filter((k) => !used.has(k));
+      if (gone.length) await idbRun("readwrite", (st) => { gone.forEach((k) => st.delete(k)); });
+    } catch (e) { /* try again next time */ }
+  }
+  function applyLookOf(e) {
+    if (!e || typeof e !== "object") return;
+    const before = getWall();
+    if (e.colors && isHex(e.colors.brand) && isHex(e.colors.primary) && isHex(e.colors.accent)) saveColors(e.colors); else saveColors({ ...PRESETS[0], preset: "cyan" });
+    writeLook(e.look === "glass" ? "glass" : "flat");
+    const w = e.wall && typeof e.wall === "object" ? e.wall : {};
+    const wall = { on: !!w.on && typeof w.id === "string", dim: numIn(w.dim, 0, 80, 30), blur: numIn(w.blur, 0, 100, 0), id: w.on && typeof w.id === "string" ? w.id : null };
+    saveWall(wall);
+    if (!wall.on) showWall(null); else if (wall.id !== before.id || !before.on || !wallUrl) { showWall(null); loadWall(); }
+  }
+  let lookFor = null;
+  function syncLook() {                                            // runs at the start of every render
+    const m = getLooks(); let changed = false;
+    for (const id of Object.keys(state.budgets)) if (!m[id]) { m[id] = currentLook(); changed = true; }        // a new budget starts with the look that is showing
+    for (const id of Object.keys(m)) if (!state.budgets[id]) { delete m[id]; changed = true; }               // a deleted budget takes its look with it
+    if (changed) { putLooks(m); tidyWalls(); }
+    if (lookFor !== state.activeId) { lookFor = state.activeId; applyLookOf(m[state.activeId]); }
   }
 
   function renderThemeSheet() {
@@ -1310,7 +1353,7 @@ html[data-look="glass"] .drawer { background:linear-gradient(165deg, rgba(48,49,
       const inp = h("input", { type: "color", id: "c-" + key, value: cur[key], "aria-describedby": "n-" + key });
       nt.id = "n-" + key;
       inp.addEventListener("input", (e) => {
-        const c2 = getColors(); const next = { ...c2, preset: "custom", [key]: e.target.value }; saveColors(next);
+        const c2 = getColors(); const next = { ...c2, preset: "custom", [key]: e.target.value }; saveColors(next); rememberLook();
         code.textContent = e.target.value; const [t2, w2] = note(e.target.value); nt.textContent = t2; nt.className = "cnote" + (w2 ? " warn" : "");
       });
       inp.addEventListener("change", () => render());
@@ -1321,7 +1364,8 @@ html[data-look="glass"] .drawer { background:linear-gradient(165deg, rgba(48,49,
       h("p", { class: "sub" }, "Glass makes the month bar, tab bar, menu and sheets see-through and blurred. Flat keeps them solid. It changes straight away."),
       h("div", { class: "seg", role: "group", "aria-label": "Style", style: "margin:12px 0 0" }, [["flat", "Flat"], ["glass", "Glass"]].map(([v, l]) => h("button", { "aria-pressed": String(look === v), onclick: () => { setLook(v); const b = document.querySelector('#themeHost .seg button[aria-pressed="true"]'); if (b) b.focus({ preventScroll: true }); } }, l))),
       h("p", { class: "sub", style: "margin-top:8px" }, "With Increase Contrast turned on, Glass stays solid so text is easy to read."));
-    host.append(wallPanel(), lookPanel, h("div", { class: "panel" }, h("h3", {}, "Colors"),
+    host.append(h("p", { class: "banner lookfor" }, "These settings are for “" + curName() + "”. Each budget keeps its own wallpaper, colors and look. Light, Dark or Auto is for the whole app."),
+      wallPanel(), lookPanel, h("div", { class: "panel" }, h("h3", {}, "Colors"),
       h("p", { class: "sub" }, "Pick a ready-made set, or choose your own. Your choice is saved on this device."),
       h("div", { class: "swatches" }, PRESETS.map((p) => h("button", { class: "swatch", "aria-pressed": String(cur.preset === p.id), "aria-label": p.name + " colors", onclick: () => pickPreset(p.id) }, h("span", { class: "chipset", "aria-hidden": "true" }, [p.brand, p.primary, p.accent].map((c) => h("i", { style: "background:" + c }))), p.name))),
       h("h3", { style: "margin-top:20px" }, "Your own colors"),
@@ -1349,6 +1393,7 @@ html[data-look="glass"] .drawer { background:linear-gradient(165deg, rgba(48,49,
   const goToday = () => { const t = new Date(); state.y = t.getFullYear(); state.m = t.getMonth(); render(); };
 
   function render() {
+    syncLook();
     applyAutoPay();
     const { y, m } = state;
     const banner = $("banner"); banner.replaceChildren();
@@ -2151,7 +2196,6 @@ html[data-look="glass"] .drawer { background:linear-gradient(165deg, rgba(48,49,
   loadUI();
   render();
   setDrawer(false);
-  loadWall();
   const m = location.hash.match(/^#b=([uz]\.[A-Za-z0-9_-]+)$/);
   if (m) {
     history.replaceState(null, "", location.href.split("#")[0]);       // keep the data out of the address bar and history
