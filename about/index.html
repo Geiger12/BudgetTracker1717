@@ -1,275 +1,318 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-CA">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Budget Tracker: tap a bill paid, see what’s left</title>
-<meta name="description" content="Budget Tracker: tap a bill paid, filter what’s left, and see everything on one screen. Saved on your phone, no account.">
-<link rel="canonical" href="https://geiger12.github.io/BudgetTracker17/about/">
-<link rel="icon" href="img/icon-192.png" type="image/png">
-<meta name="theme-color" content="#2ebfd9">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TapBudget: switch it on when you pay</title>
+<meta name="description" content="A simple budget tracker for your phone. Switch a bill on when you pay it and the date fills in. Saved on your phone, with no account.">
+<!-- Your web address: change tapbudget-ashy.vercel.app in the next four lines if the app lives somewhere else. -->
+<link rel="canonical" href="https://tapbudget-ashy.vercel.app/about/">
+<meta property="og:url" content="https://tapbudget-ashy.vercel.app/about/">
+<meta property="og:image" content="https://tapbudget-ashy.vercel.app/about/preview.png">
+<meta name="twitter:image" content="https://tapbudget-ashy.vercel.app/about/preview.png">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Budget Tracker">
-<meta property="og:title" content="Budget Tracker: tap a bill paid, see what’s left">
-<meta property="og:description" content="Filter what’s left, see it all on one screen, and pick your own colors. Saved on your phone, no account.">
-<meta property="og:url" content="https://geiger12.github.io/BudgetTracker17/about/">
-<meta property="og:image" content="https://geiger12.github.io/BudgetTracker17/about/preview.png">
+<meta property="og:site_name" content="TapBudget">
+<meta property="og:title" content="TapBudget: switch it on when you pay. See what’s left.">
+<meta property="og:description" content="A simple budget tracker for your phone. Saved on your phone, with no account.">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="A phone showing the Budget Tracker overview with three gauges, beside the words: Tap a bill paid. See what’s left.">
+<meta property="og:image:alt" content="TapBudget on a phone, showing a card with 6 of 9 bills paid.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Budget Tracker: tap a bill paid, see what’s left">
-<meta name="twitter:description" content="Filter what’s left, see it all on one screen, and pick your own colors. Saved on your phone, no account.">
-<meta name="twitter:image" content="https://geiger12.github.io/BudgetTracker17/about/preview.png">
+<meta name="theme-color" content="#f4f4f5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="app-icon.png" type="image/png">
+<link rel="apple-touch-icon" href="app-icon.png">
 <style>
-:root{--cyan:#2ebfd9;--deep:#0e7c91;--yellow:#fdcb2f;--ink:#1f2933;--muted:#4b5563;--mist:#f2f6f7;--white:#fff;--font:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;font-family:var(--font);font-size:18px;line-height:1.6;color:var(--ink);background:var(--white);-webkit-text-size-adjust:100%}
-img{max-width:100%;height:auto}
-a{color:var(--deep)}
-:focus-visible{outline:3px solid var(--ink);outline-offset:3px;border-radius:6px}
-.skip{position:absolute;left:-999px;top:8px;background:var(--ink);color:var(--white);padding:10px 16px;border-radius:10px;z-index:10}
-.skip:focus{left:8px}
-.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
-h1,h2,h3{font-weight:800;letter-spacing:-0.025em;line-height:1.08;margin:0}
-h1{font-size:clamp(2.5rem,7.4vw,4.7rem)}
-h2{font-size:clamp(1.8rem,4.6vw,2.7rem)}
-h3{font-size:1.25rem;letter-spacing:-0.01em}
-p{margin:0}
-.lede{font-size:clamp(1.1rem,2.4vw,1.3rem);max-width:34em}
-.btn{display:inline-block;padding:14px 24px;border-radius:14px;border:3px solid var(--ink);font-weight:700;text-decoration:none;color:var(--ink);background:var(--yellow);box-shadow:5px 5px 0 var(--ink);transition:transform .12s,box-shadow .12s}
-.btn:hover{transform:translate(2px,2px);box-shadow:3px 3px 0 var(--ink)}
-.btn.dark{background:var(--ink);color:var(--white);box-shadow:5px 5px 0 var(--white)}
-.btn.dark:hover{box-shadow:3px 3px 0 var(--white)}
-.textlink{color:var(--ink);font-weight:600}
-.frame{background:var(--ink);padding:8px;border-radius:40px;box-shadow:12px 12px 0 var(--yellow);width:min(100%,270px)}
-.frame img{display:block;width:100%;border-radius:33px;background:var(--white)}
-.pane{background:var(--ink);padding:7px;border-radius:26px;box-shadow:12px 12px 0 var(--yellow);width:min(100%,340px)}
-.pane img{display:block;width:100%;border-radius:20px;background:var(--white)}
+/* Plain HTML and CSS: no scripts, no trackers, no outside fonts. The look matches the app:
+   white cards, charcoal buttons, soft shadows and dark cards tinted with the app's cyan and yellow. */
+:root {
+  --bg:#f4f4f5; --surface:#ffffff; --surface-2:#efeff1; --text:#1d1e21; --muted:#64666b; --border:#e7e7ea;
+  --solid:#232428; --on-solid:#ffffff; --night:#18191c; --frame:#17181a;
+  --cyan:#2ebfd9; --deep:#0e7c91; --yellow:#fdcb2f; --green:#19a35a; --amber:#f59e0b; --red:#e5372f;
+  --shadow-1:0 1px 2px rgba(22,22,26,.04), 0 8px 24px rgba(22,22,26,.06);
+  --shadow-phone:0 30px 60px rgba(22,22,26,.22), 0 6px 16px rgba(22,22,26,.1);
+  --r-lg:24px; --r-xl:32px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg:#111214; --surface:#1b1c1f; --surface-2:#27282c; --text:#f1f1f3; --muted:#a3a5aa; --border:#2e2f34;
+    --solid:#f1f1f3; --on-solid:#17181a; --night:#0f1012; --frame:#000000;
+    --shadow-1:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.3); --shadow-phone:0 30px 60px rgba(0,0,0,.55);
+    color-scheme:dark; }
+}
+* { box-sizing:border-box; }
+html { -webkit-text-size-adjust:100%; scroll-padding-top:16px; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior:smooth; } }
+body { margin:0; background:var(--bg); color:var(--text); font:17px/1.55 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing:antialiased; overflow-x:clip;
+  padding:env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); }
+img { max-width:100%; height:auto; }
+a { color:inherit; text-underline-offset:3px; }
+:focus-visible { outline:2px solid var(--text); outline-offset:3px; border-radius:6px; }
+h1, h2, h3 { margin:0; letter-spacing:-0.03em; line-height:1.08; }
+h2 { font-size:clamp(30px, 5vw, 44px); font-weight:800; }
+h3 { font-size:20px; font-weight:780; letter-spacing:-0.02em; line-height:1.2; }
+p { margin:0; }
+.wrap { width:min(1120px, 100% - 40px); margin:0 auto; }
+.skip { position:absolute; left:-999px; top:8px; padding:10px 16px; border-radius:999px; background:var(--solid); color:var(--on-solid); z-index:10; }
+.skip:focus { left:16px; }
+.icon { width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; flex:none; }
 
-header.top{background:var(--cyan)}
-header.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:14px;padding-bottom:14px}
-.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.05rem;color:var(--ink);text-decoration:none;white-space:nowrap}
-.brand img{width:36px;height:36px;border-radius:9px;border:3px solid var(--ink)}
-header.top .btn{padding:9px 14px;box-shadow:4px 4px 0 var(--ink);white-space:nowrap;font-size:.95rem}
-@media(min-width:480px){.brand{font-size:1.15rem;gap:12px}.brand img{width:40px;height:40px}header.top .btn{padding:10px 18px;font-size:1rem}}
+/* buttons: the app's charcoal pill with a white circle arrow */
+.pill { display:inline-flex; align-items:center; justify-content:center; gap:12px; min-height:48px; padding:0 22px; border-radius:999px; font-weight:680; font-size:16px; text-decoration:none; white-space:nowrap; }
+.pill.dark { background:var(--solid); color:var(--on-solid); }
+.pill.light { background:var(--surface); color:var(--text); box-shadow:var(--shadow-1); }
+.pill.big { min-height:60px; font-size:17px; }
+.pill.dark.big { padding:6px 6px 6px 24px; }
+.pill .go { display:grid; place-items:center; width:48px; height:48px; border-radius:50%; background:var(--on-solid); color:var(--solid); }
+.pill:hover { filter:brightness(1.08); }
+.pill.light:hover { filter:brightness(.98); }
 
-.hero{background:var(--cyan);overflow:hidden}
-.hero .wrap{display:grid;gap:36px;align-items:end;padding-top:36px}
-.hero-text{display:grid;gap:22px;padding-bottom:12px;align-self:center}
-.hero h1 span{display:block}
-.cta{display:flex;flex-wrap:wrap;gap:18px 26px;align-items:center}
-.hero-phone{justify-self:center;margin-bottom:-150px}
-@media(min-width:860px){.hero .wrap{grid-template-columns:1.1fr .9fr;padding-top:56px}.hero-phone{justify-self:end;margin-right:10px;margin-bottom:-220px}.frame{width:340px;padding:9px;border-radius:44px;box-shadow:14px 14px 0 var(--yellow)}.frame img{border-radius:36px}.pane{width:380px}}
+/* header */
+.top { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:18px 0; }
+.brand { display:inline-flex; align-items:center; gap:12px; font-weight:800; font-size:20px; letter-spacing:-0.02em; text-decoration:none; }
+.brand img { width:40px; height:40px; border-radius:11px; box-shadow:var(--shadow-1); }
 
-section{padding:72px 0}
-.tabs-band{background:var(--white);padding-top:96px}
-.tabs-band .intro{max-width:36em;display:grid;gap:12px;margin-bottom:32px}
-.tabsimg{max-width:760px;background:var(--ink);padding:6px;border-radius:24px;box-shadow:12px 12px 0 var(--yellow)}
-.tabsimg img{display:block;width:100%;border-radius:18px;background:var(--white)}
-.tabnames{display:grid;gap:20px 28px;margin:44px 0 0;padding:0;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
-.tabnames div{border-top:4px solid var(--cyan);padding-top:12px}
-.tabnames dt{font-weight:800;font-size:1.15rem}
-.tabnames dd{margin:4px 0 0;color:var(--muted)}
+/* hero: the words on one side, three phones fanned out like the app's stack of cards on the other */
+.hero { display:grid; gap:40px; align-items:center; padding:28px 0 72px; }
+.hero h1 { font-size:clamp(42px, 8.4vw, 76px); font-weight:850; letter-spacing:-0.045em; line-height:1; max-width:11ch; }
+.lede { margin-top:22px; font-size:clamp(18px, 2.2vw, 21px); color:var(--muted); max-width:34ch; }
+.ctas { display:flex; flex-wrap:wrap; gap:12px; margin-top:30px; }
+.facts { display:flex; flex-wrap:wrap; gap:8px; margin:26px 0 0; padding:0; list-style:none; }
+.facts li { display:inline-flex; align-items:center; gap:8px; padding:7px 14px 7px 10px; border-radius:999px; background:var(--surface); box-shadow:var(--shadow-1); font-size:15px; font-weight:600; }
+.facts .icon { width:18px; height:18px; color:var(--green); stroke-width:2.6; }
+main { overflow-x:clip; }   /* the tilted phones may run off the screen edge, but never make the page scroll sideways */
+.fan { position:relative; height:clamp(440px, 118vw, 600px); max-height:600px; }
+.phone { margin:0; padding:8px; border-radius:40px; background:var(--frame); box-shadow:var(--shadow-phone); }
+.phone img { display:block; width:100%; border-radius:32px; }
+.fan .phone { position:absolute; top:50%; left:50%; width:clamp(190px, 52vw, 262px); }
+.fan .front { z-index:3; transform:translate(-50%, -50%); }
+.fan .left { z-index:1; transform:translate(-112%, -47%) rotate(-7deg) scale(.86); }
+.fan .right { z-index:2; transform:translate(12%, -47%) rotate(7deg) scale(.86); }
+.fan .left::after, .fan .right::after { content:""; position:absolute; inset:0; border-radius:inherit; background:#0b0c0e; opacity:.18; pointer-events:none; }
+@media (min-width:900px) {
+  .hero { grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); padding:48px 0 96px; }
+  .fan { height:600px; }
+  .fan .phone { width:262px; }
+}
 
-.feature{background:var(--mist)}
-.feature.alt{background:var(--white)}
-.feature .wrap{display:grid;gap:36px;align-items:center}
-.feature .text{display:grid;gap:16px;max-width:30em}
-.feature .shot{justify-self:center}
-@media(min-width:860px){.feature .wrap{grid-template-columns:1fr 1fr;gap:72px}.feature.flip .shot{order:-1}.feature .shot{justify-self:center}}
-.facts{margin:6px 0 0;padding-left:1.1em;color:var(--muted)}
-.facts li{margin:4px 0}
+/* sections */
+.block { padding:72px 0; }
+.block > .wrap > h2 { max-width:16ch; }
+.block .intro { margin-top:14px; font-size:19px; color:var(--muted); max-width:44ch; }
 
-.looks{background:var(--mist)}
-.looks .intro{max-width:34em;display:grid;gap:14px;margin-bottom:48px}
-.trio{display:grid;gap:14px;grid-template-columns:repeat(3,minmax(0,1fr));justify-items:center}
-@media(min-width:700px){.trio{gap:36px}}
-.trio figure{margin:0;display:grid;gap:18px;justify-items:center;width:100%}
-.trio .frame{width:min(100%,250px);border-radius:20px;padding:4px;box-shadow:6px 6px 0 var(--yellow)}
-.trio .frame img{border-radius:16px}
-.trio figcaption{font-weight:700;text-align:center;font-size:.95rem}
-@media(min-width:700px){.trio .frame{border-radius:38px;padding:8px;box-shadow:12px 12px 0 var(--yellow)}.trio .frame img{border-radius:31px}.trio figcaption{font-size:1.1rem}}
+/* three main features as tinted cards, like the gauges in the app; they swipe sideways on a phone */
+.deck { display:grid; grid-auto-flow:column; grid-auto-columns:min(82%, 340px); gap:16px; margin:32px -20px 0; padding:4px 20px 24px; overflow-x:auto; scroll-snap-type:x mandatory; scroll-padding:0 20px; scrollbar-width:none; }
+.deck::-webkit-scrollbar { display:none; }
+.tcard { scroll-snap-align:start; display:flex; flex-direction:column; min-height:300px; padding:22px; border-radius:var(--r-xl); color:#fff; box-shadow:0 22px 44px rgba(22,22,26,.22);
+  background-color:var(--night); background-image:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,0) 55%); }
+@supports (background: color-mix(in srgb, red, blue)) {
+  .tcard { background-image:radial-gradient(120% 78% at 88% -6%, color-mix(in srgb, var(--tint) 82%, transparent) 0%, transparent 64%), linear-gradient(172deg, color-mix(in srgb, var(--tint) 46%, var(--night)) 0%, var(--night) 74%); }
+}
+.tcard .badge { display:grid; place-items:center; width:52px; height:52px; border-radius:50%; background:#fff; color:#17181a; }
+.tcard h3 { margin-top:auto; padding-top:56px; font-size:26px; font-weight:800; }
+.tcard p { margin-top:8px; color:rgba(255,255,255,.86); font-size:16px; }
+@media (min-width:900px) { .deck { grid-auto-flow:row; grid-template-columns:repeat(3, minmax(0, 1fr)); overflow:visible; margin:40px 0 0; padding:0; } .tcard { min-height:340px; } }
 
-.steps{background:var(--cyan)}
-.steps h2{margin-bottom:12px}
-.steps ol{list-style:none;counter-reset:s;margin:36px 0 0;padding:0;display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
-.steps li{counter-increment:s;background:var(--white);border:3px solid var(--ink);border-radius:20px;padding:20px;box-shadow:6px 6px 0 var(--yellow);display:grid;gap:8px;align-content:start}
-.steps li::before{content:counter(s);display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--yellow);border:3px solid var(--ink);font-weight:800;font-size:1.2rem}
-.steps li b{font-size:1.1rem}
-.steps .note{margin-top:30px;max-width:42em;font-weight:600}
+.grid { display:grid; gap:16px; margin-top:16px; }
+@media (min-width:700px) { .grid { grid-template-columns:repeat(2, minmax(0, 1fr)); } }
+.card { display:flex; gap:16px; align-items:flex-start; padding:22px; border-radius:var(--r-lg); background:var(--surface); box-shadow:var(--shadow-1); }
+.card .badge { display:grid; place-items:center; flex:none; width:46px; height:46px; border-radius:50%; background:var(--surface-2); }
+.card p { margin-top:6px; color:var(--muted); font-size:16px; }
 
-.private{background:var(--ink);color:var(--white)}
-.private h2{color:var(--white);margin-bottom:34px}
-.private dl{display:grid;gap:28px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin:0}
-.private dt{color:var(--yellow);font-weight:800;font-size:1.3rem}
-.private dd{margin:6px 0 0}
+/* make it yours */
+.yours { display:grid; gap:40px; align-items:center; }
+.yours .phone { width:min(280px, 74vw); justify-self:center; transform:rotate(-3deg); }
+.ticks { margin:24px 0 0; padding:0; list-style:none; display:grid; gap:12px; }
+.ticks li { display:flex; gap:12px; align-items:flex-start; font-size:17px; }
+.ticks .icon { margin-top:3px; width:20px; height:20px; color:var(--green); stroke-width:2.6; }
+@media (min-width:900px) { .yours { grid-template-columns:minmax(0, 5fr) minmax(0, 7fr); } .yours .phone { width:290px; } }
 
-.faq{background:var(--white)}
-.faq h2{margin-bottom:28px}
-.faq details{border-top:3px solid var(--ink);padding:18px 0;max-width:46em}
-.faq details:last-of-type{border-bottom:3px solid var(--ink)}
-.faq summary{font-weight:700;font-size:1.15rem;cursor:pointer}
-.faq details p{margin-top:10px;color:var(--muted)}
+/* privacy: a charcoal panel, the same charcoal as the app's tab bar */
+.private { padding:clamp(28px, 5vw, 56px); border-radius:var(--r-xl); background:#232428; color:#f1f1f3; }
+@media (prefers-color-scheme: dark) { .private { background:#1b1c1f; box-shadow:0 0 0 1px #2e2f34; } }
+.private h2 { max-width:14ch; }
+.pgrid { display:grid; gap:24px 32px; margin-top:32px; }
+@media (min-width:700px) { .pgrid { grid-template-columns:repeat(2, minmax(0, 1fr)); } }
+.pgrid h3 { display:flex; align-items:center; gap:10px; }
+.pgrid .icon { color:var(--yellow); }
+.pgrid p { margin-top:8px; color:#c2c4c9; font-size:16px; }
+.private .more { margin-top:32px; }
+.private .pill.light { background:#fff; color:#17181a; box-shadow:none; }
 
-.final{background:var(--yellow);text-align:center}
-.final .wrap{display:grid;gap:22px;justify-items:center}
-footer{background:var(--ink);color:var(--white);padding:28px 0;font-size:.95rem}
-footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between}
-footer a{color:var(--white)}
-@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.btn{transition:none}}
+/* install steps: a real sequence, so they are numbered */
+.steps { display:grid; gap:16px; margin:32px 0 0; padding:0; list-style:none; counter-reset:step; }
+@media (min-width:800px) { .steps { grid-template-columns:repeat(3, minmax(0, 1fr)); } }
+.steps li { counter-increment:step; padding:22px; border-radius:var(--r-lg); background:var(--surface); box-shadow:var(--shadow-1); }
+.steps li::before { content:counter(step); display:grid; place-items:center; width:40px; height:40px; margin-bottom:18px; border-radius:50%; background:var(--solid); color:var(--on-solid); font-weight:800; }
+.steps p { margin-top:6px; color:var(--muted); font-size:16px; }
+.lights { display:flex; flex-wrap:wrap; gap:10px; margin-top:20px; }
+.lights span { display:inline-flex; align-items:center; gap:8px; padding:7px 14px 7px 12px; border-radius:999px; background:var(--surface); box-shadow:var(--shadow-1); font-size:15px; font-weight:600; }
+.lights i { width:11px; height:11px; border-radius:50%; }
+
+/* questions: details and summary, so they open without any script */
+.faq { margin-top:28px; display:grid; gap:10px; max-width:760px; }
+.faq details { border-radius:var(--r-lg); background:var(--surface); box-shadow:var(--shadow-1); }
+.faq summary { display:flex; align-items:center; justify-content:space-between; gap:16px; min-height:64px; padding:16px 22px; cursor:pointer; font-weight:700; font-size:18px; list-style:none; border-radius:var(--r-lg); }
+.faq summary::-webkit-details-marker { display:none; }
+.faq summary::after { content:""; flex:none; width:9px; height:9px; margin-right:4px; border-right:2.4px solid currentColor; border-bottom:2.4px solid currentColor; transform:translateY(-3px) rotate(45deg); transition:transform .2s ease; }
+.faq details[open] summary::after { transform:translateY(2px) rotate(-135deg); }
+.faq details p { padding:0 22px 20px; color:var(--muted); font-size:16px; }
+@media (prefers-reduced-motion: reduce) { .faq summary::after { transition:none; } }
+
+/* closing call and footer */
+.close { padding:24px 0 72px; text-align:center; }
+.close h2 { margin:0 auto; max-width:18ch; }
+.close .ctas { justify-content:center; }
+.foot { padding:28px 0 40px; border-top:1px solid var(--border); }
+.foot .wrap { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px; }
+.foot nav { display:flex; flex-wrap:wrap; gap:6px 22px; }
+.foot nav a { font-weight:600; }
+.foot p { color:var(--muted); font-size:15px; }
 </style>
 </head>
 <body>
-<a class="skip" href="#main">Skip to the content</a>
+<a class="skip" href="#main">Skip to content</a>
 
-<header class="top">
-  <div class="wrap">
-    <a class="brand" href="./"><img src="img/icon-192.png" alt="" width="40" height="40">Budget Tracker</a>
-    <a class="btn" href="../">Open the app</a>
-  </div>
+<header class="wrap top">
+  <a class="brand" href="./"><img src="app-icon.png" alt="" width="40" height="40">TapBudget</a>
+  <a class="pill dark" href="../">Open TapBudget</a>
 </header>
 
 <main id="main">
-  <div class="hero">
+  <section class="wrap hero" aria-labelledby="title">
+    <div>
+      <h1 id="title">Switch it on when you pay. See what’s left.</h1>
+      <p class="lede">TapBudget keeps track of your bills, paychecks and everyday spending for the month. Swipe through three cards to see where you stand.</p>
+      <div class="ctas">
+        <a class="pill dark big" href="../">Open TapBudget <span class="go" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+        <a class="pill light big" href="#install">Add it to your iPhone</a>
+      </div>
+      <ul class="facts">
+        <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>Saved on your phone</li>
+        <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>No account</li>
+        <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>Nothing is sent anywhere</li>
+      </ul>
+    </div>
+    <div class="fan">
+      <figure class="phone left"><img src="shot-bills.webp" width="600" height="1298" alt="The Bills tab: paychecks and bills for the month, each with a switch and filters for all, unpaid, paid and overdue."></figure>
+      <figure class="phone right"><img src="shot-details.webp" width="600" height="1298" alt="A bill’s own page: a savings transfer of 150 dollars due in 2 days, a switch to mark it paid and the next bills coming up."></figure>
+      <figure class="phone front"><img src="shot-overview.webp" width="600" height="1298" alt="The Overview: a stack of cards. The front card shows 6 of 9 bills paid and 490 dollars still to pay."></figure>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="what">
     <div class="wrap">
-      <div class="hero-text">
-        <h1><span>Tap a bill paid.</span><span>See what’s left.</span></h1>
-        <p class="lede">Budget Tracker is a simple budget tracker that lives on your phone. There is no account, and your budget stays on your device.</p>
-        <div class="cta">
-          <a class="btn" href="../">Open the app</a>
-          <a class="textlink" href="#home-screen">How to add it to your Home Screen</a>
+      <h2 id="what">Everything for the month on one phone</h2>
+      <p class="intro">Bills, money in and everyday spending, with the date filled in for you.</p>
+      <div class="deck">
+        <article class="tcard" style="--tint:var(--cyan)">
+          <span class="badge" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>
+          <h3>Tick off bills</h3>
+          <p>Switch a bill on when you pay it and today’s date fills in. If you paid a different amount or on another day, change it.</p>
+        </article>
+        <article class="tcard" style="--tint:var(--yellow)">
+          <span class="badge" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10"/></svg></span>
+          <h3>See the month at a glance</h3>
+          <p>Swipe through three cards: bills, money in and spending. A health light turns amber when something is due soon and red when a bill is overdue.</p>
+        </article>
+        <article class="tcard" style="--tint:var(--deep)">
+          <span class="badge" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          <h3>Open any bill</h3>
+          <p>Each bill has its own page. Swipe through what’s coming up next and switch those on too.</p>
+        </article>
+      </div>
+      <div class="grid">
+        <div class="card"><span class="badge" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M3 7h16a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7zM3 7l12-3v3M16 14h3"/></svg></span>
+          <div><h3>Everyday budgets</h3><p>Set an amount for groceries, gas or eating out, and enter what you’ve spent as you go.</p></div></div>
+        <div class="card"><span class="badge" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M5 20V10M12 20V4M19 20v-7"/></svg></span>
+          <div><h3>Where the money goes</h3><p>Planned against paid for each item, a six-month chart and a simple projection of your loan and card balances.</p></div></div>
+        <div class="card"><span class="badge" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M7 11V8a5 5 0 0110 0v3M6 11h12v9H6zM12 15v2"/></svg></span>
+          <div><h3>Bills that pay themselves</h3><p>Mark a bill as automatic and it switches itself on when it’s due. Loans and credit cards get their own progress bars.</p></div></div>
+        <div class="card"><span class="badge" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M12 3v12M7 8l5-5 5 5M5 14v5h14v-5"/></svg></span>
+          <div><h3>Share or back up</h3><p>Send a budget as a link, with or without what you’ve paid, or save a backup file.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="yours">
+    <div class="wrap yours">
+      <figure class="phone"><img src="shot-yours.webp" width="600" height="1298" alt="TapBudget in dark mode with a colorful wallpaper behind it. The Money in card is in front, showing 50 percent received." loading="lazy"></figure>
+      <div>
+        <h2 id="yours">Make each budget your own</h2>
+        <p class="intro">Keep one budget for the household and another for a trip or a side job. Each keeps its own wallpaper, colors and look, so you can tell them apart at a glance.</p>
+        <ul class="ticks">
+          <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>Use a photo from your phone as the wallpaper. It stays on your phone.</li>
+          <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>Pick one of six color sets, or choose your own three colors.</li>
+          <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>Light, dark, or follow your phone.</li>
+          <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>Text stays readable whatever picture or colors you choose.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="private">
+    <div class="wrap">
+      <div class="private">
+        <h2 id="private">Your budget stays on your phone</h2>
+        <div class="pgrid">
+          <div><h3><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>No account</h3><p>There’s nothing to sign up for and no password to remember.</p></div>
+          <div><h3><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>No server</h3><p>Budgets are saved in the browser on your phone. They don’t leave it unless you share them.</p></div>
+          <div><h3><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>Links you control</h3><p>A shared link carries the budget inside it. Anyone with the link can read it, so delete the message once it’s been imported.</p></div>
+          <div><h3><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>Keep a passcode on</h3><p>TapBudget doesn’t encrypt what it saves, so keep a passcode on your phone.</p></div>
         </div>
-      </div>
-      <div class="hero-phone frame">
-        <img src="img/first.webp" width="780" height="1688" alt="The Budget Tracker overview: three gauges for bills, money in and spending, with a short month summary underneath.">
-      </div>
-    </div>
-  </div>
-
-  <section class="tabs-band" aria-labelledby="tabs-h">
-    <div class="wrap">
-      <div class="intro">
-        <h2 id="tabs-h">Four tabs along the bottom</h2>
-        <p>Everything is a thumb away. The Overview fits on one screen, so the gauges are never cut off.</p>
-      </div>
-      <div class="tabsimg"><img src="img/tabs.webp" width="780" height="142" alt="The tab bar with Overview, Bills, Spending and Insights." loading="lazy"></div>
-      <dl class="tabnames">
-        <div><dt>Overview</dt><dd>Three gauges and a short summary, all on one fixed screen.</dd></div>
-        <div><dt>Bills</dt><dd>Income and bills, with filters and a weekly schedule.</dd></div>
-        <div><dt>Spending</dt><dd>Everyday budgets like groceries, and what is left of each.</dd></div>
-        <div><dt>Insights</dt><dd>Expected income, where the money goes, and a six-month chart.</dd></div>
-      </dl>
-    </div>
-  </section>
-
-  <section class="feature" aria-labelledby="f1">
-    <div class="wrap">
-      <div class="text">
-        <h2 id="f1">Tap a bill paid</h2>
-        <p>Switch a bill on when you pay it. Today’s date fills in for you. If you paid on another day, or a different amount, change it right there.</p>
-        <ul class="facts"><li>Bills due soon are tagged, and late ones turn red.</li><li>Everyday spending has its own box: type what you have spent so far.</li></ul>
-      </div>
-      <div class="shot pane"><img src="img/paid.webp" width="780" height="1044" alt="A list of bills. Two are marked paid with the date and amount filled in, and the next ones are still switched off." loading="lazy"></div>
-    </div>
-  </section>
-
-  <section class="feature alt flip" aria-labelledby="f2">
-    <div class="wrap">
-      <div class="text">
-        <h2 id="f2">Filter to what’s left</h2>
-        <p>Choose All, Unpaid, Paid or Overdue. Each one shows how many items it holds, so you can see what still needs paying at a glance.</p>
-        <ul class="facts"><li>A red badge on the Bills tab counts overdue bills.</li><li>The app remembers the filter you chose.</li></ul>
-      </div>
-      <div class="shot frame"><img src="img/filter.webp" width="780" height="1688" alt="The Bills tab with the Unpaid filter selected, showing one overdue bill tagged in red and the next bills due." loading="lazy"></div>
-    </div>
-  </section>
-
-  <section class="feature" aria-labelledby="f3">
-    <div class="wrap">
-      <div class="text">
-        <h2 id="f3">Plan the week</h2>
-        <p>Switch Bills from List to Schedule to see every bill and paycheck by week of the month. The current week is outlined, and the colors show what is paid, due soon or overdue.</p>
-      </div>
-      <div class="shot pane"><img src="img/schedule.webp" width="780" height="1116" alt="The Schedule view: weekly cards listing each bill and paycheck by day, with the current week outlined." loading="lazy"></div>
-    </div>
-  </section>
-
-  <section class="looks" aria-labelledby="f4">
-    <div class="wrap">
-      <div class="intro">
-        <h2 id="f4">Make it look like yours</h2>
-        <p>Pick one of six ready-made color sets, or choose your own three colors. Text colors adjust so everything stays easy to read. Use light, dark, or follow your phone.</p>
-      </div>
-      <div class="trio">
-        <figure><div class="frame"><img src="img/pal_cyan.webp" width="780" height="1688" alt="The overview in the default cyan and yellow." loading="lazy"></div><figcaption>Cyan and Yellow</figcaption></figure>
-        <figure><div class="frame"><img src="img/pal_sunset.webp" width="780" height="1688" alt="The same overview in the Sunset colors." loading="lazy"></div><figcaption>Sunset</figcaption></figure>
-        <figure><div class="frame"><img src="img/pal_berry.webp" width="780" height="1688" alt="The same overview in the Berry colors, in dark mode." loading="lazy"></div><figcaption>Berry, in dark mode</figcaption></figure>
+        <div class="more"><a class="pill light" href="privacy.html">Read the privacy policy</a></div>
       </div>
     </div>
   </section>
 
-  <section class="feature alt" aria-labelledby="f5">
+  <section class="block" id="install" aria-labelledby="install-title">
     <div class="wrap">
-      <div class="text">
-        <h2 id="f5">Share it, or keep a copy</h2>
-        <p>Send your setup, or your whole budget with its paid history, as a link. The other person gets a confirmation before anything is added. You can also save a backup file from the menu.</p>
-        <p class="facts" style="list-style:none;padding:0">On iPhone, copy the link rather than tapping it, then import it from inside the app.</p>
-      </div>
-      <div class="shot pane"><img src="img/share.webp" width="780" height="578" alt="The Share sheet with two choices: Share setup and Share with paid history." loading="lazy"></div>
-    </div>
-  </section>
-
-  <section class="steps" id="home-screen" aria-labelledby="hs">
-    <div class="wrap">
-      <h2 id="hs">Add it to your Home Screen</h2>
-      <p class="lede">It opens like an app, with its own icon.</p>
-      <ol>
-        <li><b>Open the link in Safari</b><span>Use the Open the app button on this page.</span></li>
-        <li><b>Tap Share</b><span>It is in Safari’s toolbar.</span></li>
-        <li><b>Choose Add to Home Screen</b><span>Scroll the share menu, then tap Add.</span></li>
-        <li><b>Open it from the new icon</b><span>Use the icon every time.</span></li>
+      <h2 id="install-title">Add it to your iPhone</h2>
+      <p class="intro">TapBudget runs in Safari. Add it to your Home Screen and it opens like an app.</p>
+      <ol class="steps">
+        <li><h3>Open it in Safari</h3><p>Go to TapBudget in Safari.</p></li>
+        <li><h3>Add to Home Screen</h3><p>Tap Share, then Add to Home Screen.</p></li>
+        <li><h3>Open it from the icon</h3><p>Use the new icon from now on. Safari keeps its own copy of your data, separate from the Home Screen app.</p></li>
       </ol>
-      <p class="note">Safari and the Home Screen icon keep separate copies of your data, so always open Budget Tracker from the icon once you have added it.</p>
+      <div class="lights" aria-label="What the health light means">
+        <span><i style="background:var(--green)"></i>Green: all clear</span>
+        <span><i style="background:var(--amber)"></i>Amber: due soon or over budget</span>
+        <span><i style="background:var(--red)"></i>Red: a bill is overdue</span>
+      </div>
     </div>
   </section>
 
-  <section class="private" aria-labelledby="pv">
+  <section class="block" aria-labelledby="questions">
     <div class="wrap">
-      <h2 id="pv">Your budget stays yours</h2>
-      <dl>
-        <div><dt>No account</dt><dd>Open it and start. There is nothing to sign up for.</dd></div>
-        <div><dt>Nothing uploaded</dt><dd>Your budgets are saved on your own device.</dd></div>
-        <div><dt>Yours to back up</dt><dd>Save a backup file from the menu, or share a budget as a link when you choose to.</dd></div>
-      </dl>
+      <h2 id="questions">Questions</h2>
+      <div class="faq">
+        <details><summary>What if I get a new phone?</summary><p>Open the menu and save a backup file, then restore it on the new phone. Wallpaper pictures aren’t in backups, so add yours again.</p></details>
+        <details><summary>Can two of us use the same budget?</summary><p>One of you shares it as a link and the other imports it. Each phone then has its own copy. Changes on one phone don’t show up on the other.</p></details>
+        <details><summary>Does it need the internet?</summary><p>After the first visit, TapBudget keeps a copy of itself on your phone so it can open and save without a connection.</p></details>
+        <details><summary>Can I keep more than one budget?</summary><p>Yes. Create them from the menu, and switch between them by tapping the budget name under the greeting.</p></details>
+        <details><summary>Where do I get help?</summary><p>Visit the <a href="support.html">support page</a>.</p></details>
+      </div>
     </div>
   </section>
 
-  <section class="faq" aria-labelledby="fq">
-    <div class="wrap">
-      <h2 id="fq">Questions</h2>
-      <details><summary>Do I need an account?</summary><p>No. There is no sign-up and no login.</p></details>
-      <details><summary>Where is my budget stored?</summary><p>On your device. Clearing your browser’s website data, or deleting the app, can erase your budgets, so save a backup file from the menu before big changes.</p></details>
-      <details><summary>Can I use it on more than one phone?</summary><p>Not automatically, because nothing is synced. Use Share with paid history, or a backup file, to move a budget to another phone.</p></details>
-      <details><summary>Who can see my budget?</summary><p>Only people you send a link or a backup file to. A shared link contains the budget itself, so send it to people you trust and delete the message afterwards.</p></details>
-      <details><summary>Can I change the colors?</summary><p>Yes. Open the menu, then Colors. Choose a ready-made set or pick your own, and switch between light, dark and automatic.</p></details>
-    </div>
-  </section>
-
-  <section class="final" aria-labelledby="fn">
-    <div class="wrap">
-      <h2 id="fn">Try it on your phone</h2>
-      <p class="lede">Open it, tap a bill paid, and see what’s left.</p>
-      <a class="btn dark" href="../">Open the app</a>
+  <section class="wrap close" aria-labelledby="close-title">
+    <h2 id="close-title">Try it with the example budget</h2>
+    <p class="intro" style="margin:14px auto 0">The first time you open it, a made-up budget is ready to play with. Start your own whenever you like.</p>
+    <div class="ctas">
+      <a class="pill dark big" href="../">Open TapBudget <span class="go" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
     </div>
   </section>
 </main>
 
-<footer>
+<footer class="foot">
   <div class="wrap">
-    <span>Budget Tracker. Your budget stays on your device.</span>
-    <span><a href="privacy.html">Privacy policy</a> &nbsp; <a href="support.html">Support</a> &nbsp; <a href="../">Open the app</a></span>
+    <a class="brand" href="./"><img src="app-icon.png" alt="" width="40" height="40">TapBudget</a>
+    <nav aria-label="More">
+      <a href="../">Open TapBudget</a>
+      <a href="privacy.html">Privacy policy</a>
+      <a href="support.html">Support</a>
+    </nav>
+    <p>Your budgets are saved on your device only.</p>
   </div>
 </footer>
 </body>
