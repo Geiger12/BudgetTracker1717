@@ -2,6 +2,7 @@
 <html lang="en-CA">
 <head>
 <meta charset="utf-8">
+<script src="native.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>TapBudget</title>
 <meta name="description" content="Track which bills you have paid, and when.">
@@ -930,7 +931,7 @@ html[data-easy] .toast { bottom:calc(6.2em + env(safe-area-inset-bottom, 0px)); 
     persist();
     return { app: "budget-tracker", version: 2, name: curName(), items: state.items, pay: withHistory ? Object.fromEntries(state.pay) : {}, loans: withHistory ? state.loans : state.loans.map(({ asOf, seen, ...rest }) => rest), ...(withHistory ? { cash: state.cash } : {}) };
   }
-  async function makeLink(withHistory) { return location.href.split("#")[0] + "#b=" + await toToken(payload(withHistory)); }
+  async function makeLink(withHistory) { return (window.SHARE_BASE || location.href.split("#")[0]) + "#b=" + await toToken(payload(withHistory)); }
   async function importText(text) {
     let t = String(text || "").trim();
     if (t[0] === '"' && t[t.length - 1] === '"' && t.includes('""')) t = t.slice(1, -1).replace(/""/g, '"');     // Excel wraps copied text in quotes and doubles the inner ones
