@@ -56,7 +56,7 @@ Easy mode shows the same budget, with the same data, in a much simpler way. It h
 
 **Add a bill** takes three things: what it is called, how much, and which day of the month it is due, plus a choice between a bill and money coming in. **Change or remove** on any item opens the same form. Removing always asks first.
 
-In Easy mode you can change only bills and money in. The Overview also shows everyday spending, read only. Loans and cards, the charts and the look settings stay in the full app, and are not changed by Easy mode. Text and buttons are at least 22px (27px on Extra large), buttons are at least 64px tall, and every word of text meets the 4.5:1 contrast target in light and dark, at both sizes. Wallpaper and Glass are not used in Easy mode, so text always sits on a plain background.
+In Easy mode you can change only bills and money in. The Overview also shows everyday spending, read only. Loans and cards, the charts and the look settings stay in the full app, and are not changed by Easy mode. Text and buttons are at least 22px (27px on Extra large), buttons are at least 64px tall, the main buttons (like **I paid it**) are a light tint of your colors with dark text and a clear outline, so they stand out without being heavy, and every word of text meets the 4.5:1 contrast target in light and dark, at both sizes. Wallpaper and Glass are not used in Easy mode, so text always sits on a plain background.
 
 ## Wallpaper and colors
 
@@ -133,4 +133,4 @@ Tap the budget name under the greeting, or use the menu. **Menu → Manage budge
 ## Notes
 
 - Data lives in the browser on that device and is not encrypted. The budgets and settings are in localStorage. Each budget's look is in localStorage too. The wallpaper pictures are in IndexedDB, so they never take room from your budgets. A different phone or browser starts with the example until you Import.
-- Updating the app: re-upload the files that changed. Each time `index.html` changes, also change the cache name at the top of `sw.js` (for example `tapbudget-v27` to `tapbudget-v28`) so phones drop the old copy. If a change doesn't appear, close and reopen the app.
+- Updating the app: re-upload the files that changed. Each time `index.html` changes, also change the cache name at the top of `sw.js` (for example `tapbudget-v28` to `tapbudget-v29`) so phones drop the old copy. If a change doesn't appear, close and reopen the app.
