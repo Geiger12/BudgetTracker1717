@@ -55,6 +55,10 @@ You no longer have to type a payment. Link each loan or card to the bills you al
 - The Overview card, the debt chart on Insights and the example budget all use these live balances. In Easy mode, a bill that is linked says so in plain words, and **I paid it** moves the loan too.
 - A **Share with paid history** link and a backup file carry the links and the bookkeeping. **Share setup** keeps the links but leaves the bookkeeping out, so the person who receives it starts fresh.
 
+## Version number
+
+The app shows its version, for example **TapBudget version 32**, so you can tell which copy a phone is running. It is at the very bottom of the **Settings** page (below the privacy line), pinned at the bottom of the **menu** (hidden when the menu is collapsed to icons), and at the bottom of **More** in Easy mode. It is the same number as the cache name in `sw.js` (`tapbudget-v32`).
+
 ## Easy mode
 
 For anyone who wants a calmer, larger app. Turn it on from **Menu → Easy mode (big print)** or **Settings → Easy mode (big print)**. The app then opens in Easy mode every time, until someone chooses **More → Use the full app**. The choice and the print size are saved on that device only.
@@ -146,4 +150,4 @@ Tap the budget name under the greeting, or use the menu. **Menu → Manage budge
 ## Notes
 
 - Data lives in the browser on that device and is not encrypted. The budgets and settings are in localStorage. Each budget's look is in localStorage too. The wallpaper pictures are in IndexedDB, so they never take room from your budgets. A different phone or browser starts with the example until you Import.
-- Updating the app: re-upload the files that changed. Each time `index.html` changes, also change the cache name at the top of `sw.js` (for example `tapbudget-v31` to `tapbudget-v32`) so phones drop the old copy. If a change doesn't appear, close and reopen the app.
+- Updating the app: re-upload the files that changed. Each time `index.html` changes, also change the cache name at the top of `sw.js` (for example `tapbudget-v32` to `tapbudget-v33`) so phones drop the old copy, and change `APP_VERSION` near the top of the script in `index.html` to the same number (`"33"`). That number is what the app shows as its version (see below). If a change doesn't appear, close and reopen the app.

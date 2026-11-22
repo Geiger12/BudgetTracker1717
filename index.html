@@ -548,7 +548,7 @@ html.has-wall body::before { background:var(--plate); }
 html.has-wall .strip { background:transparent; }
 html.has-wall .head { margin:var(--s1) 0 var(--s1); padding:10px 14px 10px 10px; background:var(--plate); border-radius:26px; box-shadow:var(--shadow-1); }
 html.has-wall .bar-title { align-items:center; margin-bottom:10px; padding:10px 16px; background:var(--plate); border-radius:var(--r-pill); box-shadow:var(--shadow-1); }
-html.has-wall .foot-note, html.has-wall #settingsHost > p.sub { padding:var(--s3) var(--s4); background:var(--plate); border-radius:var(--r-md); }
+html.has-wall .foot-note, html.has-wall #footVer, html.has-wall #settingsHost > p.sub { padding:var(--s3) var(--s4); background:var(--plate); border-radius:var(--r-md); }
 html.has-wall .nav.txt.here { color:var(--text); }
 html.has-wall[data-look="glass"] { --g-fill:rgba(var(--g-rgb), .92); --g-fill-strong:rgba(var(--g-rgb), .95); --g-sheen:none; }
 /* the wallpaper controls */
@@ -763,6 +763,12 @@ html[data-easy] .toast { bottom:calc(6.2em + env(safe-area-inset-bottom, 0px)); 
 .swprev { display:flex; gap:10px; }
 .swprev .sw { display:inline-block; }
 .swtry { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:12px; padding-top:12px; border-top:1px solid var(--border); font-weight:700; }
+
+/* ===== the version number, tucked away ===== */
+.verline { margin:var(--s4) 0 0; text-align:center; font-size:var(--fs-xs); font-variant-numeric:tabular-nums; }
+.drawer-ver { flex:none; padding:var(--s2) var(--s4) calc(var(--s3) + env(safe-area-inset-bottom, 0px)); text-align:center; font-size:var(--fs-xs); color:var(--dr-muted); font-variant-numeric:tabular-nums; }
+.drawer.rail .drawer-ver { display:none; }
+.ez-ver { text-align:center; margin-top:22px; }
 </style>
 
 <script>try{var t=localStorage.getItem("budget-tracker:theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);if(localStorage.getItem("budget-tracker:look")==="glass")document.documentElement.setAttribute("data-look","glass");var sw=localStorage.getItem("budget-tracker:sw");if(sw==="check"||sw==="orb"||sw==="sun"||sw==="soft")document.documentElement.setAttribute("data-sw",sw);if(localStorage.getItem("budget-tracker:easy")==="1")document.documentElement.setAttribute("data-easy","1");if(localStorage.getItem("budget-tracker:easysize")==="xl")document.documentElement.setAttribute("data-easysize","xl");var k=localStorage.getItem("budget-tracker:colorsCss");if(k){var s=document.createElement("style");s.id="userColors";s.textContent=k;document.head.appendChild(s)}var w=JSON.parse(localStorage.getItem("budget-tracker:wall")||"null");if(w&&w.on){var r=document.documentElement;r.classList.add("has-wall");r.style.setProperty("--wall-dim",String(Math.min(80,Math.max(0,+w.dim||0))/100));r.style.setProperty("--wall-blur",(Math.min(100,Math.max(0,+w.blur||0))*0.24)+"px")}}catch(e){}</script>
@@ -813,6 +819,7 @@ html[data-easy] .toast { bottom:calc(6.2em + env(safe-area-inset-bottom, 0px)); 
   <input type="file" id="restoreFile" accept="application/json,.json" hidden>
   <input type="file" id="wallFile" accept="image/*" hidden>
   <p class="sub foot-note">Your budgets are saved on this device only. Open the menu to add items, share, import or back up. <a data-ext href="about/privacy.html" target="_blank" rel="noopener">Privacy policy</a> · <a data-ext href="about/support.html" target="_blank" rel="noopener">Support</a></p>
+  <p class="sub verline" id="footVer" hidden></p>
 </div>
 
 <div id="easy"></div>
@@ -857,6 +864,7 @@ html[data-easy] .toast { bottom:calc(6.2em + env(safe-area-inset-bottom, 0px)); 
   let itemsCol = null, payCol = null;
 
   /* ---------- storage: this device's localStorage, one entry holding every budget ---------- */
+  const APP_VERSION = "32";                                        // keep equal to the number in sw.js (CACHE = "tapbudget-v32")
   const KEY = "budget-tracker:v2", OLD_KEY = "budget-tracker:v1";
   const TYPES = ["income", "bill", "variable"];
   const ISO = /^\d{4}-\d{2}-\d{2}$/;
@@ -1374,7 +1382,8 @@ html[data-easy] .toast { bottom:calc(6.2em + env(safe-area-inset-bottom, 0px)); 
         h("button", { class: "iconbtn", "aria-label": "Close menu", onclick: () => setDrawer(false) }, ico("close"))),
       h("button", { class: "drawer-toggle", "aria-label": railOn ? "Expand menu" : "Collapse menu to icons", "aria-expanded": String(!railOn), onclick: () => setRail(!railOn) }, ico(railOn ? "chevR" : "chevL")),
       h("div", { class: "drawer-search" }, ico("search"), q),
-      body);
+      body,
+      h("div", { class: "drawer-ver" }, "TapBudget version " + APP_VERSION));
   }
 
   const greeting = () => { const hr = new Date().getHours(); return hr >= 5 && hr < 12 ? "Good morning" : hr >= 12 && hr < 18 ? "Good afternoon" : "Good evening"; };
@@ -1623,6 +1632,7 @@ html[data-easy] .toast { bottom:calc(6.2em + env(safe-area-inset-bottom, 0px)); 
 
   function render() {
     _ledger = null;
+    { const fv = $("footVer"); if (fv) { fv.textContent = "TapBudget version " + APP_VERSION; fv.hidden = state.tab !== "settings"; } }       // the version, at the very bottom of the Settings page
     syncLook();
     applyAutoPay();
     const { y, m } = state;
@@ -2175,6 +2185,7 @@ html[data-easy] .toast { bottom:calc(6.2em + env(safe-area-inset-bottom, 0px)); 
     out.push(h("div", { class: "ez-card" }, h("h2", {}, "My account balance"), h("p", { class: "ez-text", style: "margin-top:0" }, cur.kind === "unset" ? "Not set yet." : "About " + fmt(cur.v) + " on the 1st of " + MONTHS[now.getMonth()] + "."), h("button", { class: "ez-btn alt", onclick: () => easyOpenForm("balance") }, cur.kind === "unset" ? "Tell us my balance" : "Change my balance")));
     if (ids.length > 1) out.push(h("div", { class: "ez-card" }, h("h2", {}, "My budgets"), h("p", { class: "ez-text", style: "margin-top:0" }, "Showing: " + curName()), ...ids.filter((id) => id !== state.activeId).map((id) => h("button", { class: "ez-btn alt", onclick: () => { switchTo(id); state.easyTab = "home"; render(); window.scrollTo(0, 0); } }, "Show " + state.budgets[id].name))));
     out.push(h("div", { class: "ez-card" }, h("h2", {}, "Keep a copy"), h("p", { class: "ez-text", style: "margin-top:0" }, "Save a backup copy of your budget on this phone, in case you ever need it."), h("button", { class: "ez-btn alt", onclick: () => backup() }, "Save a backup copy")));
+    out.push(h("p", { class: "ez-sub ez-ver" }, "TapBudget version " + APP_VERSION));
     out.push(h("div", { class: "ez-card" }, h("h2", {}, "The full app"), h("p", { class: "ez-text", style: "margin-top:0" }, "It has charts, spending budgets, loans and more."), h("button", { class: "ez-btn alt", onclick: () => setEasy(false) }, "Use the full app")));
     return out;
   }
