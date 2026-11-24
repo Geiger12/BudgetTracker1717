@@ -2,157 +2,124 @@
 <html lang="en-CA">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Support | TapBudget</title>
-<meta name="description" content="Help with TapBudget: marking bills paid, moving a budget, reminders, Face ID lock, backups, wallpaper and colors.">
+<meta name="description" content="Help with TapBudget: marking bills paid, moving a budget, reminders, Face ID lock and backups.">
+<meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#f4f4f5" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
-<link rel="icon" href="app-icon.png" type="image/png">
-<link rel="apple-touch-icon" href="app-icon.png">
+<link rel="icon" href="img/icon-192.png" type="image/png">
 <style>
-/* Plain HTML and CSS: no scripts, no trackers, no outside fonts. Same look as the About page and the app. */
-:root { --bg:#f4f4f5; --surface:#ffffff; --surface-2:#efeff1; --text:#1d1e21; --muted:#64666b; --border:#e7e7ea;
-  --solid:#232428; --on-solid:#ffffff; --night:#18191c; --cyan:#2ebfd9; --yellow:#fdcb2f; --green:#19a35a;
-  --shadow-1:0 1px 2px rgba(22,22,26,.04), 0 8px 24px rgba(22,22,26,.06); --r-lg:24px; --r-xl:32px; color-scheme:light; }
-@media (prefers-color-scheme: dark) {
-  :root { --bg:#111214; --surface:#1b1c1f; --surface-2:#27282c; --text:#f1f1f3; --muted:#a3a5aa; --border:#2e2f34;
-    --solid:#f1f1f3; --on-solid:#17181a; --night:#0f1012; --shadow-1:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.3); color-scheme:dark; }
-}
-* { box-sizing:border-box; }
-html { -webkit-text-size-adjust:100%; scroll-padding-top:16px; }
-@media (prefers-reduced-motion: no-preference) { html { scroll-behavior:smooth; } }
-body { margin:0; background:var(--bg); color:var(--text); font:17px/1.6 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing:antialiased;
-  padding:env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); }
-a { color:inherit; text-underline-offset:3px; }
-:focus-visible { outline:2px solid var(--text); outline-offset:3px; border-radius:6px; }
-h1, h2 { margin:0; letter-spacing:-0.03em; line-height:1.1; }
-h1 { font-size:clamp(38px, 8vw, 56px); font-weight:850; letter-spacing:-0.04em; }
-h2 { font-size:22px; font-weight:800; letter-spacing:-0.02em; line-height:1.25; }
-p { margin:0 0 12px; }
-p:last-child, ul:last-child { margin-bottom:0; }
-ul { margin:0 0 12px; padding-left:1.25em; }
-li { margin:6px 0; }
-li::marker { color:var(--muted); }
-.wide { width:min(1120px, 100% - 40px); margin:0 auto; }
-.wrap { width:min(760px, 100% - 40px); margin:0 auto; }
-.skip { position:absolute; left:-999px; top:8px; padding:10px 16px; border-radius:999px; background:var(--solid); color:var(--on-solid); z-index:10; }
-.skip:focus { left:16px; }
-.icon { width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; flex:none; }
-.pill { display:inline-flex; align-items:center; justify-content:center; gap:12px; min-height:48px; padding:0 22px; border-radius:999px; font-weight:680; font-size:16px; text-decoration:none; white-space:nowrap; }
-.pill.dark { background:var(--solid); color:var(--on-solid); }
-.pill.light { background:#fff; color:#17181a; }
-.pill.go-pill { padding:6px 6px 6px 22px; min-height:58px; }
-.pill .go { display:grid; place-items:center; width:46px; height:46px; border-radius:50%; background:var(--on-solid); color:var(--solid); }
-.pill.light .go { background:#17181a; color:#fff; }
-.pill:hover { filter:brightness(1.08); }
-.top { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:18px 0; }
-.brand { display:inline-flex; align-items:center; gap:12px; font-weight:800; font-size:20px; letter-spacing:-0.02em; text-decoration:none; }
-.brand img { width:40px; height:40px; border-radius:11px; box-shadow:var(--shadow-1); }
-main { padding:24px 0 72px; }
-.meta { margin-top:10px; color:var(--muted); }
-/* the one-line promise: a dark card tinted with the app's cyan, like the app's gauge cards.
-   The cyan glow is kept light enough that white text passes 4.5:1 even where the glow is strongest. */
-.promise { margin:28px 0 12px; padding:24px; border-radius:var(--r-xl); color:#fff; box-shadow:0 22px 44px rgba(22,22,26,.2);
-  background-color:var(--night); background-image:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,0) 55%); }
-@supports (background: color-mix(in srgb, red, blue)) {
-  .promise { background-image:radial-gradient(110% 110% at 100% -40%, color-mix(in srgb, var(--cyan) 60%, transparent) 0%, transparent 62%), linear-gradient(172deg, color-mix(in srgb, var(--cyan) 40%, var(--night)) 0%, var(--night) 80%); }
-}
-.promise p { margin:0; font-size:clamp(19px, 2.6vw, 22px); font-weight:700; letter-spacing:-0.01em; line-height:1.4; }
-.promise .pill { margin-top:20px; }
-/* quick links to each part of the page */
-.jump { display:flex; flex-wrap:wrap; gap:8px; margin:20px 0 8px; padding:0; list-style:none; }
-.jump li { margin:0; }
-.jump a { display:inline-flex; align-items:center; min-height:40px; padding:0 16px; border-radius:999px; border:1px solid var(--border); background:var(--surface); font-size:15px; font-weight:650; text-decoration:none; }
-.jump a:hover { background:var(--surface-2); }
-/* each part of the page is a white card */
-.sec { margin-top:14px; padding:22px 24px; border-radius:var(--r-lg); background:var(--surface); box-shadow:var(--shadow-1); }
-.sec h2 { margin-bottom:10px; }
-.sec ol { margin:0 0 12px; padding:0; list-style:none; counter-reset:step; }
-.sec ol li { position:relative; margin:10px 0; padding-left:44px; counter-increment:step; }
-.sec ol li::before { content:counter(step); position:absolute; left:0; top:-1px; display:grid; place-items:center; width:30px; height:30px; border-radius:50%; background:var(--solid); color:var(--on-solid); font-size:14px; font-weight:800; }
-.note { margin-top:12px; padding:12px 16px; border-radius:16px; background:var(--surface-2); font-size:16px; }
-.contact { margin-top:28px; padding:clamp(24px, 4vw, 36px); border-radius:var(--r-xl); background:#232428; color:#f1f1f3; }
-@media (prefers-color-scheme: dark) { .contact { background:#1b1c1f; box-shadow:0 0 0 1px #2e2f34; } }
-.contact h2 { font-size:clamp(24px, 4vw, 30px); }
-.contact p { margin-top:10px; color:#c2c4c9; }
-.contact .pill { margin-top:18px; }
-.mail { word-break:break-all; }
-.foot { padding:28px 0 40px; border-top:1px solid var(--border); }
-.foot .wide { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px; }
-.foot nav { display:flex; flex-wrap:wrap; gap:6px 22px; }
-.foot nav a { font-weight:600; }
-.foot nav a[aria-current] { text-decoration:none; color:var(--muted); }
-.foot p { margin:0; color:var(--muted); font-size:15px; }
+:root{color-scheme:light dark;--bg:#f4f4f5;--surface:#ffffff;--text:#1d1e21;--muted:#64666b;--border:#e3e3e7;--solid:#232428;--on-solid:#ffffff;--green:#19a35a;--shadow:0 1px 2px rgba(16,24,40,.07),0 6px 18px rgba(16,24,40,.05);--font:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+@media(prefers-color-scheme:dark){:root{--bg:#111214;--surface:#232428;--text:#f1f1f3;--muted:#a3a5aa;--border:#2e2f34;--solid:#f1f1f3;--on-solid:#17181a;--green:#2cc275;--shadow:none}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:var(--font);font-size:18px;line-height:1.65;color:var(--text);background:var(--bg)}
+a{color:var(--text);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px}
+a:hover{text-decoration-thickness:3px}
+:focus-visible{outline:3px solid var(--text);outline-offset:3px;border-radius:8px}
+.skip{position:absolute;left:-999px;top:8px;background:var(--solid);color:var(--on-solid);padding:10px 16px;border-radius:999px;z-index:10;text-decoration:none}
+.skip:focus{left:8px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 28px}
+header.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:20px;padding-bottom:20px}
+.brand{display:flex;align-items:center;gap:12px;font-weight:800;font-size:1.1rem;letter-spacing:-.01em;color:var(--text);text-decoration:none;white-space:nowrap}
+.brand img{width:38px;height:38px;border-radius:10px;display:block}
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 22px;border-radius:999px;background:var(--solid);color:var(--on-solid);font-weight:700;font-size:.98rem;text-decoration:none;white-space:nowrap;transition:opacity .15s}
+.btn:hover{opacity:.88;text-decoration:none}
+.btn.alt{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
+.btn.small{padding:10px 18px;font-size:.95rem}
+.col{max-width:720px}
+.hero{padding:clamp(36px,7vw,84px) 0 clamp(8px,2vw,20px)}
+h1{font-size:clamp(2.8rem,9vw,5rem);font-weight:800;letter-spacing:-.04em;line-height:1.0;margin:0 0 22px}
+.lead{font-size:clamp(1.15rem,2.6vw,1.4rem);line-height:1.5;color:var(--muted);margin:0 0 26px;max-width:30em}
+.chips,.actions{display:flex;flex-wrap:wrap;gap:10px;margin:0;padding:0;list-style:none}
+.chip{display:inline-flex;align-items:center;gap:9px;background:var(--surface);border-radius:999px;padding:10px 18px 10px 14px;font-weight:600;font-size:.98rem;box-shadow:var(--shadow)}
+.chip svg{width:18px;height:18px;flex:none;fill:none;stroke:var(--green);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.meta{color:var(--muted);font-size:.95rem;margin:22px 0 0}
+.body{padding:clamp(20px,4vw,44px) 0 72px}
+section.sec{border-top:1px solid var(--border);padding:30px 0 10px;margin-top:26px}
+section.sec:first-child{margin-top:0}
+h2{font-size:clamp(1.45rem,3.6vw,1.9rem);font-weight:800;letter-spacing:-.025em;line-height:1.15;margin:0 0 12px}
+p{margin:0 0 16px}
+section.sec>:last-child{margin-bottom:0}
+ul{margin:0 0 16px;padding-left:1.25em}
+li{margin:7px 0}
+footer{border-top:1px solid var(--border);color:var(--muted);padding:28px 0 40px;font-size:.95rem}
+footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between}
+footer a{color:var(--text)}
+@media(max-width:520px){body{font-size:17px}.wrap{padding:0 20px}.btn.small{padding:9px 14px;font-size:.9rem}}
+@media(max-width:380px){header.top .wrap{flex-wrap:wrap;gap:10px 12px}.brand{font-size:1rem;gap:10px}.brand img{width:34px;height:34px}}
+@media(prefers-reduced-motion:reduce){.btn{transition:none}}
 </style>
 </head>
 <body>
 <a class="skip" href="#main">Skip to the content</a>
-
-<header class="wide top">
-  <a class="brand" href="./"><img src="app-icon.png" alt="" width="40" height="40">TapBudget</a>
-  <a class="pill dark" href="../">Open TapBudget</a>
-</header>
-
-<main id="main">
+<header class="top">
   <div class="wrap">
-    <h1>Support</h1>
-    <p class="meta">Help with TapBudget.</p>
-    <div class="promise"><p>Need help? Email davidgeiger1@gmail.com and say what you were doing and what you saw.</p></div>
-    <nav aria-label="On this page"><ul class="jump"><li><a href="#around">Getting around</a></li><li><a href="#paid">Mark a bill paid</a></li><li><a href="#move">Move a budget</a></li><li><a href="#reminders">Reminders</a></li><li><a href="#lock">Face ID</a></li><li><a href="#backup">Backups</a></li><li><a href="#look">Wallpaper and colors</a></li><li><a href="#contact">Contact</a></li></ul></nav>
-    <section class="sec" id="around" aria-labelledby="around-h">
-      <h2 id="around-h">Find your way around</h2>
-      <ul><li>Tap the app icon at the top left to open the menu, or swipe in from the left edge of the screen.</li><li>The round + at the top right adds a bill, a paycheck or an everyday budget.</li><li>Tap the budget name under the greeting to switch budgets.</li><li>On the Overview, swipe the cards left or right, or tap Bills, Money in or Spending above them.</li></ul>
-    </section>
-    <section class="sec" id="paid" aria-labelledby="paid-h">
-      <h2 id="paid-h">Mark a bill paid</h2>
-      <p>Switch the bill on. Today’s date fills in. If you paid on another day or a different amount, change the date and the amount right under the bill.</p><p>Tap the round arrow at the end of a bill to open its own page. You can switch it on there too, and swipe through the bills coming up next.</p>
-    </section>
-    <section class="sec" id="move" aria-labelledby="move-h">
-      <h2 id="move-h">Move a budget to another phone</h2>
-      <p>Nothing syncs on its own. To move a budget:</p><ol><li>Open the menu and choose Share this budget. Pick Share setup, or Share with paid history. Copy the link.</li><li>On the other phone, open TapBudget, open the menu and choose Import a budget. Paste the link and confirm.</li></ol><p>On iPhone, copy the link rather than tapping it. A tapped link opens the web version in Safari, which keeps its own separate data. You can also save a backup file from the menu and restore it on the other phone.</p><p class="note">Wallpaper pictures and colors don’t travel with a link or a backup file. Set them again on the other phone.</p>
-    </section>
-    <section class="sec" id="reminders" aria-labelledby="reminders-h">
-      <h2 id="reminders-h">Bill reminders</h2>
-      <ul><li>Open the menu and choose Turn on bill reminders. Allow notifications when iOS asks.</li><li>You get a note at 9:00 the day before a bill is due and on the day it is due.</li><li>Marking a bill paid removes its reminder. The example budget has no reminders.</li><li>If nothing arrives, open the iPhone Settings app, choose TapBudget, then Notifications, and make sure they are allowed.</li></ul>
-    </section>
-    <section class="sec" id="lock" aria-labelledby="lock-h">
-      <h2 id="lock-h">Face ID lock</h2>
-      <p>Open the menu and choose Turn on Face ID lock. The app asks for Face ID when it opens, and when you come back after a short time away. If Face ID does not work, use your phone passcode. Turning the lock off also needs Face ID or your passcode.</p>
-    </section>
-    <section class="sec" id="backup" aria-labelledby="backup-h">
-      <h2 id="backup-h">Keep a backup</h2>
-      <p>Your budgets live only on your device. If you delete the app or reset the phone, they can be lost. Open the menu and choose Save a backup file now and then, and keep the file somewhere safe. To bring a budget back, choose Restore from a file.</p>
-    </section>
-    <section class="sec" id="look" aria-labelledby="look-h">
-      <h2 id="look-h">Wallpaper and colors</h2>
-      <p>Open the menu and choose Wallpaper and colors. Each budget keeps its own wallpaper, colors and look, and the sheet tells you which budget you are changing.</p><ul><li>Tap Choose a picture to use one of your photos. Dim fades it and Blur softens it. Remove takes it away.</li><li>Pick a ready-made color set, or choose your own three colors.</li><li>Light, dark and automatic are in the menu too. They apply to every budget.</li></ul><p>If a photo won’t open, try saving it as a JPEG or PNG first.</p>
-    </section>
-    <section class="sec" id="update" aria-labelledby="update-h">
-      <h2 id="update-h">If something looks out of date</h2>
-      <p>Close TapBudget completely and open it again. It picks up the newest version the next time it opens with a connection.</p>
-    </section>
-    <section class="sec" id="delete" aria-labelledby="delete-h">
-      <h2 id="delete-h">Delete your data</h2>
-      <p>Open the menu, choose Manage budgets, and delete a budget. Deleting the app removes its data from your phone.</p>
-    </section>
-    <section class="contact" id="contact" aria-labelledby="contact-h">
-      <h2 id="contact-h">Still stuck?</h2>
-      <p>Email <span class="mail">davidgeiger1@gmail.com</span> and say what you were doing and what you saw.</p>
-      <a class="pill light go-pill" href="mailto:davidgeiger1@gmail.com?subject=TapBudget%20help">Email for help <span class="go" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
-    </section>
+    <a class="brand" href="./"><img src="img/icon-192.png" alt="" width="38" height="38">TapBudget</a>
+    <a class="btn small" href="../">Open TapBudget</a>
   </div>
-</main>
+</header>
+<main id="main">
+<div class="wrap">
+<div class="hero col">
+<h1>Support</h1>
+<p class="lead">Need help? Email <a href="mailto:tapbudget17@gmail.com">tapbudget17@gmail.com</a> and say what you were doing and what you saw.</p>
+<div class="actions"><a class="btn" href="mailto:tapbudget17@gmail.com">Email support</a><a class="btn alt" href="privacy.html">Privacy policy</a></div>
+<p class="meta">Help with TapBudget.</p>
+</div>
+<div class="body col">
+<section class="sec">
+<h2>Mark a bill paid</h2>
+<p>Switch the bill on. Today's date fills in. If you paid on another day or a different amount, change the date and the amount right under the bill.</p>
+</section>
 
-<footer class="foot">
-  <div class="wide">
-    <a class="brand" href="./"><img src="app-icon.png" alt="" width="40" height="40">TapBudget</a>
-    <nav aria-label="More">
-      <a href="./">About</a>
-      <a href="../">Open TapBudget</a>
-      <a href="privacy.html">Privacy policy</a>
-      <a href="support.html" aria-current="page">Support</a>
-    </nav>
-    <p>Your budget stays on your device.</p>
+<section class="sec">
+<h2>Move a budget to another phone</h2>
+<p>Nothing syncs on its own. To move a budget:</p>
+<ul>
+<li>Open the menu and choose Share this budget. Pick Share setup, or Share with paid history. Copy the link.</li>
+<li>On the other phone, open TapBudget, open the menu and choose Import a budget. Paste the link and confirm.</li>
+</ul>
+<p>On iPhone, copy the link rather than tapping it. A tapped link opens the web version in Safari, which keeps its own separate data. You can also save a backup file from the menu and restore it on the other phone.</p>
+</section>
+
+<section class="sec">
+<h2>Bill reminders</h2>
+<ul>
+<li>Open the menu and choose Turn on bill reminders. Allow notifications when iOS asks.</li>
+<li>You get a note at 9:00 the day before a bill is due and on the day it is due.</li>
+<li>Marking a bill paid removes its reminder. The example budget has no reminders.</li>
+<li>If nothing arrives, open the iPhone Settings app, choose TapBudget, then Notifications, and make sure they are allowed.</li>
+</ul>
+</section>
+
+<section class="sec">
+<h2>Face ID lock</h2>
+<p>Open the menu and choose Turn on Face ID lock. The app asks for Face ID when it opens, and when you come back after a short time away. If Face ID does not work, use your phone passcode. Turning the lock off also needs Face ID or your passcode.</p>
+</section>
+
+<section class="sec">
+<h2>Keep a backup</h2>
+<p>Your budgets live only on your device. If you delete the app or reset the phone, they can be lost. Open the menu and choose Save a backup file now and then, and keep the file somewhere safe. To bring a budget back, choose Restore from a file.</p>
+</section>
+
+<section class="sec">
+<h2>Change the colors</h2>
+<p>Open the menu and choose Wallpaper and colors. Pick a ready-made set or choose your own, add a wallpaper, and choose how switches look. Light, dark and automatic are in the menu too.</p>
+</section>
+
+<section class="sec">
+<h2>Delete your data</h2>
+<p>Open the menu, choose Manage budgets, and delete a budget. Deleting the app removes its data from your phone.</p>
+</section>
+</div>
+</div>
+</main>
+<footer>
+  <div class="wrap">
+    <span>TapBudget. Your budget stays on your device.</span>
+    <span><a href="./">About</a> &nbsp; <a href="privacy.html">Privacy policy</a> &nbsp; <a href="support.html">Support</a></span>
   </div>
 </footer>
 </body>
