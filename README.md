@@ -67,7 +67,7 @@ You no longer have to type a payment. Link each loan or card to the bills you al
 
 ## Version number
 
-The app shows its version, for example **TapBudget version 33**, so you can tell which copy a phone is running. It is at the very bottom of the **Settings** page (below the privacy line), pinned at the bottom of the **menu** (hidden when the menu is collapsed to icons), and at the bottom of **More** in Easy mode. It is the same number as the cache name in `sw.js` (`tapbudget-v33`).
+The app shows its version, for example **TapBudget version 34**, so you can tell which copy a phone is running. It is at the very bottom of the **Settings** page (below the privacy line), pinned at the bottom of the **menu** (hidden when the menu is collapsed to icons), and at the bottom of **More** in Easy mode. It is the same number as the cache name in `sw.js` (`tapbudget-v33`).
 
 ## Easy mode
 
@@ -110,6 +110,12 @@ Open **Menu → Wallpaper and colors…** (it is in Settings too). Everything he
 
 Green, orange and red keep their meaning (paid, due soon, overdue) whichever colors you pick.
 
+## The app icon
+
+The icon is navy, with the cyan and yellow ring and a white check. The same picture is used for the Home Screen (`icon-192.png`, `icon-512.png`, `apple-touch-icon.png`), inside the app (the menu button and the top of the menu), and on the About, privacy and support pages (`about/app-icon.png`). A web app has one Home Screen icon, so it stays navy in light and dark mode.
+
+The iPhone app (the separate `TapBudget-iOS` project) can switch: cyan in light mode, navy in dark mode, and a gray version for tinted icons.
+
 ## Put it online with GitHub Pages (free)
 
 1. On github.com, create a new repository (for example `budget-tracker`). Make it **Public**.
@@ -119,16 +125,19 @@ Green, orange and red keep their meaning (paid, due soon, overdue) whichever col
 
 ## The About page
 
-`about/` is a one-page site that explains the app and points people to it. It lives at `https://YOUR-USERNAME.github.io/YOUR-REPO/about/`. Share that link when you want to explain the app. Its buttons open the app itself.
+`about/` is a one-page site that explains the app and points people to it. It lives at `YOUR-ADDRESS/about/`. Share that link when you want to explain the app. Its buttons open the app itself.
 
-It is plain HTML with no scripts, trackers or outside fonts. `about/preview.png` is the card that shows when the link is pasted into a message or post.
+It is plain HTML and CSS with no scripts, trackers or outside fonts, and it follows the phone's light or dark setting. Its pictures are real screenshots of the example budget, so they show made-up names and amounts only:
 
-**Set your web address (needed once).** The page tells social sites where it lives, using the address `https://geiger12.github.io/BudgetTracker17/about/`. Replace it with your own in four lines near the top of `about/index.html`:
+- `index.html`: the page.
+- `shot-overview.webp`, `shot-bills.webp`, `shot-details.webp` and `shot-yours.webp`: the phone screenshots, taken from version 34.
+- `app-icon.png`: the navy app icon at the top and bottom of the About, privacy and support pages.
+- `preview.png`: the card that shows when the link is pasted into a message or post.
+- `privacy.html` and `support.html`: the privacy policy and support pages, linked from the page.
 
-1. On GitHub, open `about/index.html` and click the pencil (Edit).
-2. Press Ctrl+H (Cmd+Option+F on a Mac) to find and replace.
-3. Find `geiger12.github.io/BudgetTracker17` and replace it with `YOUR-USERNAME.github.io/YOUR-REPO`, then replace all.
-4. Commit the change.
+When the app's look changes, retake the screenshots so the page stays true to the app.
+
+**Set your web address (needed once).** The page tells social sites where it lives, using `https://tapbudget-ashy.vercel.app/about/` in four lines near the top of `about/index.html`. If your address is different, open `about/index.html`, find and replace `tapbudget-ashy.vercel.app` with your own address, and save or commit the change.
 
 Social sites keep the first preview they see, so test before you post: Facebook's Sharing Debugger, LinkedIn's Post Inspector, or paste the link into a draft.
 
@@ -160,4 +169,4 @@ Tap the budget name under the greeting, or use the menu. **Menu → Manage budge
 ## Notes
 
 - Data lives in the browser on that device and is not encrypted. The budgets and settings are in localStorage. Each budget's look is in localStorage too. The wallpaper pictures are in IndexedDB, so they never take room from your budgets. A different phone or browser starts with the example until you Import.
-- Updating the app: re-upload the files that changed. Each time `index.html` changes, also change the cache name at the top of `sw.js` (for example `tapbudget-v33` to `tapbudget-v34`) so phones drop the old copy, and change `APP_VERSION` near the top of the script in `index.html` to the same number (`"34"`). That number is what the app shows as its version (see below). If a change doesn't appear, close and reopen the app.
+- Updating the app: re-upload the files that changed. Each time `index.html` changes, also change the cache name at the top of `sw.js` (for example `tapbudget-v34` to `tapbudget-v35`) so phones drop the old copy, and change `APP_VERSION` near the top of the script in `index.html` to the same number (`"34"`). That number is what the app shows as its version (see below). If a change doesn't appear, close and reopen the app.
